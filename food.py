@@ -11,4 +11,5 @@ class Food:
         self.rect = pygame.Rect(self.pos[0], self.pos[1], self.size, self.size)
 
     def draw(self):
-        pygame.draw.ellipse(self.window, self.color, self.rect, self.size)
+        pygame.draw.ellipse(self.window, self.color, self.rect)
+        #pygame.draw.ellipse(self.window, self.color, self.rect, self.size)

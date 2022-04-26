@@ -15,7 +15,8 @@ class Blob:
         self.window = window
 
     def draw(self):
-        pygame.draw.circle(self.window, self.color, self.pos, self.size)
+        #pygame.draw.circle(self.window, self.color, self.pos, self.size)
+        pygame.draw.circle(self.window, self.color, [int(self.pos[0]), int(self.pos[1])], self.size)
 
 
     def move(self,x,y):
