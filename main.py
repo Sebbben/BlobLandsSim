@@ -4,26 +4,38 @@ from blob import Blob
 from food import Food
 
 
-FOOD_AMOUNT = 100
+FOOD_AMOUNT = 300
+START_NUMBER_OF_BLOBS = 1
+START_BLOB_SIZE = 10
+
 
 pygame.init()
 
 window = pygame.display.set_mode((800, 600))
 
-
 FPS = 30 # frames per second setting
 fpsClock = pygame.time.Clock()
-
 
 
 blobs = []
 foods = []
 
-for _ in range(2):
-    blobs.append(Blob(10,[random.randint(0,window.get_width()), random.randint(0, window.get_height())], window))
+for _ in range(START_NUMBER_OF_BLOBS):
+    # blobs.append(Blob(START_BLOB_SIZE,[random.randint(0,window.get_width()), random.randint(0, window.get_height())], window))
+    blobs.append(Blob(START_BLOB_SIZE,[window.get_width()//2, window.get_height()//2], window))
 
-for _ in range(2):
-    foods.append(Food([random.randint(0,window.get_width()), random.randint(0, window.get_height())], window))
+def checkIfEaten():
+    global foods
+    global blobs
+    for blob in blobs:
+        newFoods = []
+        for food in foods:
+            if blob.size > blob.distToPoint(food.pos[0], food.pos[1]):
+                blob.eat(food)
+            else:
+                newFoods.append(food)
+        foods = newFoods
+            
 
 def update():
     
@@ -34,14 +46,17 @@ def update():
     for blob in blobs:
         blob.update()
 
+
+    checkIfEaten()
+
     
 
 def draw():
-    for blob in blobs:
-        blob.draw()
-    
     for food in foods:
         food.draw()
+    
+    for blob in blobs:
+        blob.draw()
 
 while True:
     window.fill((255, 255, 255))
