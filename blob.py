@@ -3,25 +3,52 @@ import pygame
 import random
 
 class Blob:
-    def __init__(self, size:float, pos:list, window) -> None:
+    def __init__(self, size:float, pos:list, window, dna = {}) -> None:
+        self.MAX_MUTATION = 1/2
+
         self.targetRange = 100
         self.speed = 4
         self.color = (255,0,0)
         self.target = None
         self.energyConsumption = 1/100
 
-        self.dna = {
-            "maxSize": 40,
-            "splittNumber": 2
+        self.dnaClamp = {
+            "maxSize":[30, 100],
+            "splittNumber": [2,8]
         }
 
+        if dna:
+            self.dna = dna
+        else:
+            self.dna = {
+                "maxSize": 40,
+                "splittNumber": 2
+            }
 
         self.pos = pos
         self.size = size
         
-      
-    
         self.window = window
+
+        self.mutate()
+
+    def clampMutations(self):
+        for key in self.dna:
+            if len(self.dnaClamp) == 2:
+                self.dna[key] = max(self.dnaClamp[key][0], min(self.dnaClamp[key][1], self.dna[key]))
+            else:
+                self.dna[key] = max(self.dnaClamp[key][0], self.dna[key])
+        
+
+    def mutate(self):
+        dnaKeys = list(self.dna.keys())
+        for _ in random.choices([0,1,2],[45,50,5]):
+            geneToMod = dnaKeys[random.randint(0,len(dnaKeys)-1)]
+            # print("Pre-mutation,:",geneToMod,self.dna[geneToMod])
+            self.dna[geneToMod] += random.randint(-int(self.dna[geneToMod]*self.MAX_MUTATION),int(self.dna[geneToMod]*self.MAX_MUTATION))
+            # print("Post-mutation:",self.dna[geneToMod])
+            # print()
+        self.clampMutations()
 
     def draw(self):
         pygame.draw.circle(self.window, self.color, [int(self.pos[0]), int(self.pos[1])], round(self.size))
@@ -43,7 +70,7 @@ class Blob:
     def split(self):
         newBlobs = []
         for _ in range(self.dna["splittNumber"]):
-            newBlobs.append(Blob(self.size//self.dna["splittNumber"], [self.pos[0]+random.randint(0,self.size//self.dna["splittNumber"]),self.pos[1]+random.randint(0,self.size//self.dna["splittNumber"])], self.window))
+            newBlobs.append(Blob(self.size//self.dna["splittNumber"], [self.pos[0]+random.randint(0,self.size//self.dna["splittNumber"]),self.pos[1]+random.randint(0,self.size//self.dna["splittNumber"])], self.window, self.dna))
         return newBlobs
 
     def moveTowards(self, x, y, steps):
@@ -65,7 +92,6 @@ class Blob:
         
     def eat(self, food):
         self.size = sqrt(self.size**2 + food.size**2).real
-        print(self.size)
 
     def update(self):
 

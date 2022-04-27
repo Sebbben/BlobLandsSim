@@ -12,7 +12,8 @@ MIN_BLOB_SIZE = 5
 
 pygame.init()
 
-window = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
+# window = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
+window = pygame.display.set_mode((1920, 1080))
 
 FPS = 30 # frames per second setting
 fpsClock = pygame.time.Clock()
@@ -57,6 +58,8 @@ def checkIfTooSmall():
     for blob in blobs:
         if blob.size > MIN_BLOB_SIZE:
             newblobs.append(blob)
+        else:
+            print("Tragic death:", blob.dna)
 
     blobs = newblobs
 
