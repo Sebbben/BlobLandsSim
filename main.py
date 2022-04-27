@@ -5,13 +5,13 @@ from food import Food
 
 
 FOOD_AMOUNT = 300
-START_NUMBER_OF_BLOBS = 1
+START_NUMBER_OF_BLOBS = 3
 START_BLOB_SIZE = 10
 
 
 pygame.init()
 
-window = pygame.display.set_mode((800, 600))
+window = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
 
 FPS = 30 # frames per second setting
 fpsClock = pygame.time.Clock()
