@@ -4,9 +4,10 @@ from blob import Blob
 from food import Food
 
 
-FOOD_AMOUNT = 300
-START_NUMBER_OF_BLOBS = 3
-START_BLOB_SIZE = 10
+FOOD_AMOUNT = 600
+START_NUMBER_OF_BLOBS = 1
+START_BLOB_SIZE = 20
+MIN_BLOB_SIZE = 5
 
 
 pygame.init()
@@ -19,6 +20,10 @@ fpsClock = pygame.time.Clock()
 
 blobs = []
 foods = []
+
+for _ in range(FOOD_AMOUNT//2):
+    foods.append(Food([random.randint(0,window.get_width()), random.randint(0, window.get_height())], window))
+
 
 for _ in range(START_NUMBER_OF_BLOBS):
     # blobs.append(Blob(START_BLOB_SIZE,[random.randint(0,window.get_width()), random.randint(0, window.get_height())], window))
@@ -36,18 +41,54 @@ def checkIfEaten():
                 newFoods.append(food)
         foods = newFoods
             
+def checkIfRottenFood():
+    global foods
+    newFoods = []
+
+    for food in foods:
+        if food.age < food.maxAge:
+            newFoods.append(food)
+    foods = newFoods
+
+
+def checkIfTooSmall():
+    global blobs
+    newblobs = []
+    for blob in blobs:
+        if blob.size > MIN_BLOB_SIZE:
+            newblobs.append(blob)
+
+    blobs = newblobs
+
+def checkIfTooLarge():
+    global blobs
+    newblobs = []
+    for blob in blobs:
+        if blob.readyToSplitt():
+            newblobs += blob.split()
+        else:
+            newblobs.append(blob)
+
+    blobs = newblobs
+
 
 def update():
-    
+    global blobs
+
     if len(foods) < FOOD_AMOUNT:
         foods.append(Food([random.randint(0,window.get_width()), random.randint(0, window.get_height())], window))
         
     
     for blob in blobs:
         blob.update()
+        
+    for food in foods:
+        food.update()
 
-
+    checkIfRottenFood()
     checkIfEaten()
+    checkIfTooSmall()
+    checkIfTooLarge()
 
     
 

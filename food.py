@@ -1,15 +1,18 @@
 import pygame
-
+from random import randint as ri
 class Food:
     def __init__(self, pos, window) -> None:
-        self.size = 5
-        self.color = (0,255,0)
+        self.size = ri(5,10)
+        self.color = (0,ri(180,255),0)
+        self.maxAge = (30)*20  #  (FPS) * seconds
+        self.age = ri(0,self.maxAge)
 
         self.pos = pos
         self.window = window
 
-        self.rect = pygame.Rect(self.pos[0], self.pos[1], self.size, self.size)
+
+    def update(self):
+        self.age += 1
 
     def draw(self):
-        pygame.draw.ellipse(self.window, self.color, self.rect)
-        #pygame.draw.ellipse(self.window, self.color, self.rect, self.size)
+        pygame.draw.circle(self.window, self.color, self.pos, self.size)
