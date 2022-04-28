@@ -3,13 +3,13 @@ import sys, random
 from blob import Blob
 from food import Food
 
-FPS = 120 # frames per second setting
+FPS = 30 # frames per second setting
 WIN_W = 1920
 WIN_H = 1080
 
 FOOD_PERC = 1/3456
 FOOD_AMOUNT = int((WIN_W*WIN_H)*FOOD_PERC)
-START_NUMBER_OF_BLOBS = 1
+START_NUMBER_OF_BLOBS = 5
 START_BLOB_SIZE = 20
 MIN_BLOB_SIZE = 5
 
@@ -31,20 +31,35 @@ for _ in range(FOOD_AMOUNT//2):
 
 
 for _ in range(START_NUMBER_OF_BLOBS):
-    # blobs.append(Blob(START_BLOB_SIZE,[random.randint(0,window.get_width()), random.randint(0, window.get_height())], window))
-    blobs.append(Blob(START_BLOB_SIZE,[window.get_width()//2, window.get_height()//2], window))
+    blobs.append(Blob(START_BLOB_SIZE,[random.randint(0,window.get_width()), random.randint(0, window.get_height())], window))
+    # blobs.append(Blob(START_BLOB_SIZE,[window.get_width()//2, window.get_height()//2], window))
 
 def checkIfEaten():
     global foods
     global blobs
     for blob in blobs:
-        newFoods = []
-        for food in foods:
-            if blob.size > blob.distToPoint(food.pos[0], food.pos[1]):
-                blob.eat(food)
-            else:
-                newFoods.append(food)
-        foods = newFoods
+        if not blob.dna["meatEater"]:
+            newFoods = []
+            for food in foods:
+                if blob.size > blob.distToPoint(food.pos[0], food.pos[1]):
+                    blob.eat(food)
+                else:
+                    newFoods.append(food)
+            foods = newFoods
+
+        else:
+            newMeat = []
+            for meat in blobs:
+                if blob == meat: 
+                    newMeat.append(meat)
+                    continue
+                if blob.size > blob.distToPoint(meat.pos[0], meat.pos[1]) and blob.size > meat.size-10 and not meat.dna["meatEater"]:  
+                    blob.eat(meat)
+                else:
+                    newMeat.append(meat)
+
+            blobs = newMeat
+                           
             
 def checkIfRottenFood():
     global foods
