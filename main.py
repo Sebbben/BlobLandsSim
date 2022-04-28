@@ -27,7 +27,7 @@ blobs = []
 foods = []
 
 for _ in range(FOOD_AMOUNT//2):
-    foods.append(Food([random.randint(0,window.get_width()), random.randint(0, window.get_height())], window))
+    foods.append(Food([random.randint(0,window.get_width()), random.randint(0, window.get_height())], window, age=random.randint(0,FPS*20)))
 
 
 for _ in range(START_NUMBER_OF_BLOBS):

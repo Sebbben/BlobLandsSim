@@ -44,10 +44,7 @@ class Blob:
         dnaKeys = list(self.dna.keys())
         for _ in random.choices([0,1,2],[45,50,5]):
             geneToMod = dnaKeys[random.randint(0,len(dnaKeys)-1)]
-            # print("Pre-mutation,:",geneToMod,self.dna[geneToMod])
             self.dna[geneToMod] += random.randint(-int(self.dna[geneToMod]*self.MAX_MUTATION),int(self.dna[geneToMod]*self.MAX_MUTATION))
-            # print("Post-mutation:",self.dna[geneToMod])
-            # print()
         self.clampMutations()
 
     def draw(self):
@@ -71,6 +68,8 @@ class Blob:
         newBlobs = []
         for _ in range(self.dna["splittNumber"]):
             newBlobs.append(Blob(self.size//self.dna["splittNumber"], [self.pos[0]+random.randint(0,self.size//self.dna["splittNumber"]),self.pos[1]+random.randint(0,self.size//self.dna["splittNumber"])], self.window, self.dna))
+        for b in newBlobs:
+            print(b.dna)
         return newBlobs
 
     def moveTowards(self, x, y, steps):
