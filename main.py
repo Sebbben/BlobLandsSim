@@ -3,19 +3,24 @@ import sys, random
 from blob import Blob
 from food import Food
 
+FPS = 120 # frames per second setting
+WIN_W = 1920
+WIN_H = 1080
 
-FOOD_AMOUNT = 600
-START_NUMBER_OF_BLOBS = 1
+FOOD_PERC = 1/3456
+FOOD_AMOUNT = int((WIN_W*WIN_H)*FOOD_PERC)
+START_NUMBER_OF_BLOBS = 5
 START_BLOB_SIZE = 20
 MIN_BLOB_SIZE = 5
 
+lastBlobInfo = None
+paused = False
 
 pygame.init()
 
 # window = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
-window = pygame.display.set_mode((1920, 1080))
+window = pygame.display.set_mode((1920, 1080), pygame.SCALED)
 
-FPS = 30 # frames per second setting
 fpsClock = pygame.time.Clock()
 
 
@@ -23,24 +28,39 @@ blobs = []
 foods = []
 
 for _ in range(FOOD_AMOUNT//2):
-    foods.append(Food([random.randint(0,window.get_width()), random.randint(0, window.get_height())], window))
+    foods.append(Food([random.randint(0,window.get_width()), random.randint(0, window.get_height())], window, age=random.randint(0,FPS*20)))
 
 
 for _ in range(START_NUMBER_OF_BLOBS):
-    # blobs.append(Blob(START_BLOB_SIZE,[random.randint(0,window.get_width()), random.randint(0, window.get_height())], window))
-    blobs.append(Blob(START_BLOB_SIZE,[window.get_width()//2, window.get_height()//2], window))
+    blobs.append(Blob(START_BLOB_SIZE,[random.randint(0,window.get_width()), random.randint(0, window.get_height())], window))
+    # blobs.append(Blob(START_BLOB_SIZE,[window.get_width()//2, window.get_height()//2], window))
 
 def checkIfEaten():
     global foods
     global blobs
     for blob in blobs:
-        newFoods = []
-        for food in foods:
-            if blob.size > blob.distToPoint(food.pos[0], food.pos[1]):
-                blob.eat(food)
-            else:
-                newFoods.append(food)
-        foods = newFoods
+        if not blob.dna["meatEater"]:
+            newFoods = []
+            for food in foods:
+                if blob.size > blob.distToPoint(food.pos[0], food.pos[1]):
+                    blob.eat(food)
+                else:
+                    newFoods.append(food)
+            foods = newFoods
+
+        else:
+            newMeat = []
+            for meat in blobs:
+                if blob == meat: 
+                    newMeat.append(meat)
+                    continue
+                if blob.size > blob.distToPoint(meat.pos[0], meat.pos[1]) and blob.size > meat.size-10 and not meat.dna["meatEater"]:  
+                    blob.eat(meat)
+                else:
+                    newMeat.append(meat)
+
+            blobs = newMeat
+                           
             
 def checkIfRottenFood():
     global foods
@@ -75,6 +95,17 @@ def checkIfTooLarge():
     blobs = newblobs
 
 
+def getBlobInfo():
+    global blobs
+    global lastBlobInfo
+
+    lastBlobInfo = None
+    mouseX,mouseY = pygame.mouse.get_pos()
+    for blob in blobs:
+        if blob.distToPoint(mouseX,mouseY) < blob.size*2:
+            print(blob.dna)
+            lastBlobInfo = blob.dna
+
 def update():
     global blobs
 
@@ -96,11 +127,19 @@ def update():
     
 
 def draw():
+    global lastBlobInfo
+
     for food in foods:
         food.draw()
     
     for blob in blobs:
         blob.draw()
+
+    if pygame.font and lastBlobInfo:
+        f = pygame.font.Font(None, 64)
+        text = f.render(str(lastBlobInfo),True, (0,0,0))
+        textPos = text.get_rect(centerx=window.convert().get_width()/2, y=10)
+        window.blit(text,textPos)
 
 while True:
     window.fill((255, 255, 255))
@@ -110,7 +149,13 @@ while True:
             pygame.quit()
             sys.exit()
 
-    update()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            getBlobInfo()
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            paused = not paused
+            
+
+    if not paused: update()
     draw()    
         
 

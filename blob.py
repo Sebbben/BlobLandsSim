@@ -4,7 +4,7 @@ import random
 
 class Blob:
     def __init__(self, size:float, pos:list, window, dna = {}) -> None:
-        self.MAX_MUTATION = 1/2
+        self.MAX_MUTATION = 1/4
 
         self.targetRange = 100
         self.speed = 4
@@ -22,11 +22,16 @@ class Blob:
         else:
             self.dna = {
                 "maxSize": 40,
-                "splittNumber": 2
+                "splittNumber": 2,
+                "meatEater":bool(random.randint(0,2))
             }
 
         self.pos = pos
         self.size = size
+
+        if self.dna["meatEater"]:
+            self.energyConsumption = 1/450
+            self.color = (0,0,255)
         
         self.window = window
 
@@ -34,6 +39,7 @@ class Blob:
 
     def clampMutations(self):
         for key in self.dna:
+            if not key in self.dnaClamp: continue
             if len(self.dnaClamp) == 2:
                 self.dna[key] = max(self.dnaClamp[key][0], min(self.dnaClamp[key][1], self.dna[key]))
             else:
@@ -44,10 +50,7 @@ class Blob:
         dnaKeys = list(self.dna.keys())
         for _ in random.choices([0,1,2],[45,50,5]):
             geneToMod = dnaKeys[random.randint(0,len(dnaKeys)-1)]
-            # print("Pre-mutation,:",geneToMod,self.dna[geneToMod])
             self.dna[geneToMod] += random.randint(-int(self.dna[geneToMod]*self.MAX_MUTATION),int(self.dna[geneToMod]*self.MAX_MUTATION))
-            # print("Post-mutation:",self.dna[geneToMod])
-            # print()
         self.clampMutations()
 
     def draw(self):
@@ -70,7 +73,9 @@ class Blob:
     def split(self):
         newBlobs = []
         for _ in range(self.dna["splittNumber"]):
-            newBlobs.append(Blob(self.size//self.dna["splittNumber"], [self.pos[0]+random.randint(0,self.size//self.dna["splittNumber"]),self.pos[1]+random.randint(0,self.size//self.dna["splittNumber"])], self.window, self.dna))
+            newBlobs.append(Blob(self.size//self.dna["splittNumber"], [self.pos[0]+random.randint(0,self.size//self.dna["splittNumber"]),self.pos[1]+random.randint(0,self.size//self.dna["splittNumber"])].copy(), self.window, self.dna.copy()))
+        for b in newBlobs:
+            print(b.dna)
         return newBlobs
 
     def moveTowards(self, x, y, steps):
