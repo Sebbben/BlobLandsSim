@@ -1,4 +1,3 @@
-from numpy import average
 import pygame
 import sys, random
 from blob import Blob
@@ -163,16 +162,20 @@ def showStats():
             avrgVegiDna["maxSize"].append(blob.dna["maxSize"])
             avrgVegiDna["splittNumber"].append(blob.dna["splittNumber"])
 
-    for key in avrgVegiDna:
-        avrgVegiDna[key] = sum(avrgVegiDna[key])//len(avrgVegiDna[key])
-    for key in avrgMeatEaterDna:
-        avrgMeatEaterDna[key] = sum(avrgMeatEaterDna[key])//len(avrgMeatEaterDna[key])
+    if len(avrgVegiDna["maxSize"]):
+        for key in avrgVegiDna:
+            avrgVegiDna[key] = sum(avrgVegiDna[key])//len(avrgVegiDna[key])
+    if len(avrgMeatEaterDna["maxSize"]):
+        for key in avrgMeatEaterDna:
+            avrgMeatEaterDna[key] = sum(avrgMeatEaterDna[key])//len(avrgMeatEaterDna[key])
 
     if pygame.font:
         f = pygame.font.Font(None, 32)
         text = f.render("Vegi:"+ str(avrgVegiDna) + " "*50 + "MeatEater: " + str(avrgMeatEaterDna),True, (0,0,0))
         textPos = text.get_rect(centerx=window.convert().get_width()/2, y=10)
         window.blit(text,textPos)
+    else:
+        print("No font :(")
 
 while True:
     window.fill((255, 255, 255))
