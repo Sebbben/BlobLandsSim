@@ -4,6 +4,9 @@ import random
 
 class Blob:
     def __init__(self, size:float, pos:list, window, dna = {}) -> None:
+        self.pos = pos
+        self.size = size
+
         self.MAX_MUTATION = 1/4
 
         self.targetRange = 100
@@ -11,6 +14,8 @@ class Blob:
         self.color = (255,0,0)
         self.target = None
         self.energyConsumption = 1/100
+
+        self.eatCooldown = self.size*3
 
         self.dnaClamp = {
             "maxSize":[30, 100],
@@ -27,9 +32,6 @@ class Blob:
                 "meatEater":False
             }
 
-        self.pos = pos
-        self.size = size
-
 
         
         self.window = window
@@ -45,12 +47,6 @@ class Blob:
                 self.dna[key] = max(self.dnaClamp[key][0], self.dna[key])
                 
             
-            if (random.randint(0, 20) == 2):
-                self.dna["meatEater"] = not self.dna["meatEater"]
-                
-            if self.dna["meatEater"]:
-                self.energyConsumption = 1/450
-                self.color = (0,0,255)
         
 
     def mutate(self):
@@ -58,6 +54,13 @@ class Blob:
         for _ in random.choices([0,1,2],[45,50,5]):
             geneToMod = dnaKeys[random.randint(0,len(dnaKeys)-1)]
             self.dna[geneToMod] += random.randint(-int(self.dna[geneToMod]*self.MAX_MUTATION),int(self.dna[geneToMod]*self.MAX_MUTATION))
+
+        if (random.randint(0, 40) == 2):
+            self.dna["meatEater"] = not self.dna["meatEater"]
+            
+        if self.dna["meatEater"]:
+            self.energyConsumption = 1/450
+            self.color = (0,0,255)
         self.clampMutations()
 
     def draw(self):
@@ -102,12 +105,18 @@ class Blob:
     def newTarget(self, r):
         return [random.randint(0,self.window.get_width()-ceil(self.size)), random.randint(0, self.window.get_height()-ceil(self.size))]
         
-    def eat(self, food):
-        self.size = sqrt(self.size**2 + food.size**2).real
+    def eat(self, food, FPS):
+        if self.dna["meatEater"] and food is Blob:
+            if self.eatCooldown < 0:
+                self.eatCooldown = food.size*(FPS*0.25)
+                self.size = sqrt(self.size**2 + food.size**2).real
+        else:
+            self.size = sqrt(self.size**2 + food.size**2).real
 
     def update(self):
 
         self.size -= self.energyConsumption
+        self.eatCooldown = max(-1, self.eatCooldown-1)
 
         if self.target == None or self.distToPoint(self.target[0], self.target[1]) < self.speed:
             self.target = self.newTarget(self.targetRange)

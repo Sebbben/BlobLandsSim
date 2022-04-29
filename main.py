@@ -47,7 +47,7 @@ def checkIfEaten():
             newFoods = []
             for food in foods:
                 if blob.size > blob.distToPoint(food.pos[0], food.pos[1]):
-                    blob.eat(food)
+                    blob.eat(food,FPS)
                 else:
                     newFoods.append(food)
             foods = newFoods
@@ -59,7 +59,7 @@ def checkIfEaten():
                     newMeat.append(meat)
                     continue
                 if blob.size > blob.distToPoint(meat.pos[0], meat.pos[1]) and blob.size > meat.size-10 and not meat.dna["meatEater"]:  
-                    blob.eat(meat)
+                    blob.eat(meat, FPS)
                 else:
                     newMeat.append(meat)
 
@@ -187,8 +187,12 @@ while True:
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             getBlobInfo()
-        elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-            paused = not paused
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                paused = not paused
+            elif event.key == pygame.K_ESCAPE:
+                pygame.quit()
+                sys.exit()
             
 
     if not paused: update() 
