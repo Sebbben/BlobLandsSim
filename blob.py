@@ -23,15 +23,14 @@ class Blob:
             self.dna = {
                 "maxSize": 40,
                 "splittNumber": 2,
-                "meatEater":bool(random.randint(0,2))
+                #"meatEater":bool(random.randint(0,2))
+                "meatEater":False
             }
 
         self.pos = pos
         self.size = size
 
-        if self.dna["meatEater"]:
-            self.energyConsumption = 1/450
-            self.color = (0,0,255)
+
         
         self.window = window
 
@@ -44,6 +43,14 @@ class Blob:
                 self.dna[key] = max(self.dnaClamp[key][0], min(self.dnaClamp[key][1], self.dna[key]))
             else:
                 self.dna[key] = max(self.dnaClamp[key][0], self.dna[key])
+                
+            
+            if (random.randint(0, 20) == 2):
+                self.dna["meatEater"] = not self.dna["meatEater"]
+                
+            if self.dna["meatEater"]:
+                self.energyConsumption = 1/450
+                self.color = (0,0,255)
         
 
     def mutate(self):
