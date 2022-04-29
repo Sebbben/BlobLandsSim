@@ -113,7 +113,7 @@ class Blob:
         else:
             self.size = sqrt(self.size**2 + food.size**2).real
 
-    def update(self):
+    def update(self, blobs, food):
 
         self.size -= self.energyConsumption
         self.eatCooldown = max(-1, self.eatCooldown-1)

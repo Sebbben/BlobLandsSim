@@ -118,7 +118,7 @@ def update():
         
     
     for blob in blobs:
-        blob.update()
+        blobs, food = blob.update(blobs,food)
         
     for food in foods:
         food.update()
