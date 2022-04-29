@@ -73,7 +73,7 @@ class Blob:
     def split(self):
         newBlobs = []
         for _ in range(self.dna["splittNumber"]):
-            newBlobs.append(Blob(self.size//self.dna["splittNumber"], [self.pos[0]+random.randint(0,self.size//self.dna["splittNumber"]),self.pos[1]+random.randint(0,self.size//self.dna["splittNumber"])], self.window, self.dna.copy()))
+            newBlobs.append(Blob(self.size//self.dna["splittNumber"], [self.pos[0]+random.randint(0,self.size//self.dna["splittNumber"]),self.pos[1]+random.randint(0,self.size//self.dna["splittNumber"])].copy(), self.window, self.dna.copy()))
         for b in newBlobs:
             print(b.dna)
         return newBlobs

@@ -3,7 +3,7 @@ import sys, random
 from blob import Blob
 from food import Food
 
-FPS = 30 # frames per second setting
+FPS = 120 # frames per second setting
 WIN_W = 1920
 WIN_H = 1080
 
@@ -14,6 +14,7 @@ START_BLOB_SIZE = 20
 MIN_BLOB_SIZE = 5
 
 lastBlobInfo = None
+paused = False
 
 pygame.init()
 
@@ -150,8 +151,11 @@ while True:
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             getBlobInfo()
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            paused = not paused
+            
 
-    update()
+    if not paused: update()
     draw()    
         
 
