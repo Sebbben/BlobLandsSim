@@ -2,6 +2,8 @@ import pygame
 import sys, random
 from blob import Blob
 from food import Food
+#import ctypes
+
 
 FPS = 120 # frames per second setting
 WIN_W = 1920
@@ -26,6 +28,8 @@ fpsClock = pygame.time.Clock()
 
 blobs = []
 foods = []
+
+#ctypes.windll.shcore.SetProcessDpiAwareness(1)
 
 for _ in range(FOOD_AMOUNT//2):
     foods.append(Food([random.randint(0,window.get_width()), random.randint(0, window.get_height())], window, age=random.randint(0,FPS*20)))
