@@ -42,43 +42,67 @@ def checkIfEaten():
     global foods
     global blobs
 
+    
+    foods.sort(key=lambda f: f.pos[0])
+    blobs.sort(key=lambda b: b.pos[0])
+
+
     for blob in blobs:
         if not blob.dna["meatEater"]:
             newFoods = []
             for food in foods:
-                if blob.size > blob.distToPoint(food.pos[0], food.pos[1]):
+                if food.pos[0]<blob.pos[0]-blob.size*2 or food.pos[0]>blob.pos[0]+blob.size*2: # skip if food is too far left or right of blob
+                    newFoods.append(food)
+                    continue 
+                if blob.distTo(food.pos) < blob.size-(food.size):
                     blob.eat(food,FPS)
                 else:
                     newFoods.append(food)
             foods = newFoods
-
         else:
-            newMeat = []
-            for meat in blobs:
-                if blob == meat: 
-                    newMeat.append(meat)
-                    continue
-                if blob.size > blob.distToPoint(meat.pos[0], meat.pos[1]) and blob.size > meat.size-10 and not meat.dna["meatEater"]:  
-                    blob.eat(meat, FPS)
-                else:
-                    newMeat.append(meat)
+            for b in blobs:
+                if b.pos[0]<blob.pos[0]-blob.size*2 or b.pos[0]>blob.pos[0]+blob.size*2: continue # skip if blob is too far left or right of blob 
+                if blob.distTo(b.pos) < blob.size-(b.size):
+                    blob.eat(b,FPS)
+                    b.dead = True
 
-            blobs = newMeat
+
+    # for blob in blobs:
+    #     if not blob.dna["meatEater"]:
+    #         newFoods = []
+    #         for food in foods:
+    #             if blob.size > blob.distToPoint(food.pos[0], food.pos[1]):
+    #                 blob.eat(food,FPS)
+    #             else:
+    #                 newFoods.append(food)
+    #         foods = newFoods
+
+    #     else:
+    #         newMeat = []
+    #         for meat in blobs:
+    #             if blob == meat: 
+    #                 newMeat.append(meat)
+    #                 continue
+    #             if blob.size > blob.distToPoint(meat.pos[0], meat.pos[1]) and blob.size > meat.size-10 and not meat.dna["meatEater"]:  
+    #                 blob.eat(meat, FPS)
+    #             else:
+    #                 newMeat.append(meat)
+
+    #         blobs = newMeat
                            
             
-def checkIfRottenFood(foods):
-    foods = [food for food in foods if food.age < food.maxAge]
-    
-
+def checkIfRottenFood():
+    global foods
+    foods = [food for food in foods if food.notRotten()]
 
 def getBlobInfo():
     global blobs
     global lastBlobInfo
 
     lastBlobInfo = None
-    mouseX,mouseY = pygame.mouse.get_pos()
+    mousePos = pygame.mouse.get_pos()
     for blob in blobs:
-        if blob.distToPoint(mouseX,mouseY) < blob.size*2:
+        if blob.distTo(mousePos) < blob.size*2:
             lastBlobInfo = blob.dna
 
 def update():
@@ -96,7 +120,7 @@ def update():
     
     blobs = [blob for blob in blobs if not blob.dead]
 
-    checkIfRottenFood(foods)
+    checkIfRottenFood()
     checkIfEaten()
     
 

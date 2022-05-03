@@ -17,3 +17,6 @@ class Food:
 
     def draw(self):
         pygame.draw.circle(self.window, self.color, self.pos, self.size)
+    
+    def notRotten(self):
+        return self.age < self.maxAge

@@ -58,7 +58,7 @@ class Blob:
             geneToMod = dnaKeys[random.randint(0,len(dnaKeys)-1)]
             self.dna[geneToMod] += random.randint(-int(self.dna[geneToMod]*self.MAX_MUTATION),int(self.dna[geneToMod]*self.MAX_MUTATION))
 
-        if (random.randint(0, 100) == 2):
+        if (random.randint(0, 60) == 2):
             self.dna["meatEater"] = not self.dna["meatEater"]
             
         if self.dna["meatEater"]:
@@ -76,8 +76,8 @@ class Blob:
         self.pos[1] += self.yMove
              
         
-    def distToPoint(self, x,y):
-        return math.dist([x,y],self.pos)
+    def distTo(self, otherPos):
+        return math.dist(otherPos,self.pos)
         # return round(sqrt(abs(x-self.pos[0])**2 + abs(y-self.pos[+1])**2).real,2)
 
     def readyToSplitt(self) -> bool:
@@ -93,7 +93,7 @@ class Blob:
         xOff = x-self.pos[0]
         yOff = y-self.pos[1]
 
-        distToTarget = self.distToPoint(x,y)
+        distToTarget = self.distTo([x,y])
 
         factor = steps/distToTarget
 
@@ -117,13 +117,14 @@ class Blob:
     def eat(self, food, FPS):
         if self.dna["meatEater"] and food is Blob:
             if self.eatCooldown < 0:
-                self.eatCooldown = food.size*(FPS*0.25)
+                # self.eatCooldown = food.size*(FPS*0.25)
+                self.eatCooldown = 0
                 self.size = sqrt(self.size**2 + food.size**2).real
         else:
             self.size = sqrt(self.size**2 + food.size**2).real
 
     def updateTarget(self):
-        if self.target == None or self.distToPoint(self.target[0], self.target[1]) < self.speed:
+        if self.target == None or self.distTo(self.target) < self.speed:
             self.target = self.newTarget(self.targetRange)
             self.makeMoveVector(self.target[0], self.target[1], self.speed)
 
