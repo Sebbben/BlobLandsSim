@@ -9,6 +9,8 @@ class Blob:
 
         self.MAX_MUTATION = 1/4
 
+        self.dead = False
+        self.MIN_BLOB_SIZE = 5
         self.targetRange = 100
         self.speed = 4
         self.color = (255,0,0)
@@ -55,27 +57,26 @@ class Blob:
             geneToMod = dnaKeys[random.randint(0,len(dnaKeys)-1)]
             self.dna[geneToMod] += random.randint(-int(self.dna[geneToMod]*self.MAX_MUTATION),int(self.dna[geneToMod]*self.MAX_MUTATION))
 
-        if (random.randint(0, 40) == 2):
+        if (random.randint(0, 100) == 2):
             self.dna["meatEater"] = not self.dna["meatEater"]
             
         if self.dna["meatEater"]:
             self.energyConsumption = 1/450
             self.color = (0,0,255)
+
         self.clampMutations()
 
     def draw(self):
         pygame.draw.circle(self.window, self.color, [int(self.pos[0]), int(self.pos[1])], round(self.size))
 
 
-    def move(self,x,y):
-        self.pos[0] += x
-        self.pos[1] += y
-        
-        
-       
+    def move(self):
+        self.pos[0] += self.xMove
+        self.pos[1] += self.yMove
+             
         
     def distToPoint(self, x,y):
-        return round(sqrt(abs(x-self.pos[0])**2 + abs(y-self.pos[1])**2).real,2)
+        return round(sqrt(abs(x-self.pos[0])**2 + abs(y-self.pos[+1])**2).real,2)
 
     def readyToSplitt(self) -> bool:
         return self.size > self.dna["maxSize"]
@@ -84,12 +85,9 @@ class Blob:
         newBlobs = []
         for _ in range(self.dna["splittNumber"]):
             newBlobs.append(Blob(self.size//self.dna["splittNumber"], [self.pos[0]+random.randint(0,self.size//self.dna["splittNumber"]),self.pos[1]+random.randint(0,self.size//self.dna["splittNumber"])].copy(), self.window, self.dna.copy()))
-        for b in newBlobs:
-            print(b.dna)
         return newBlobs
 
-    def moveTowards(self, x, y, steps):
-        
+    def makeMoveVector(self, x, y, steps):
         xOff = x-self.pos[0]
         yOff = y-self.pos[1]
 
@@ -97,10 +95,19 @@ class Blob:
 
         factor = steps/distToTarget
 
-        xMove = round(xOff*factor,2)
-        yMove = round(yOff*factor,2)
+        self.xMove = round(xOff*factor,2)
+        self.yMove = round(yOff*factor,2)
         
-        self.move(xMove,yMove)
+
+
+    def checkIfTooSmall(self):
+        if self.size < self.MIN_BLOB_SIZE:
+            self.dead = True
+
+    def checkIfTooLarge(self,blobs):
+        if self.readyToSplitt():
+            self.dead = True
+            blobs += self.split()
 
     def newTarget(self, r):
         return [random.randint(0,self.window.get_width()-ceil(self.size)), random.randint(0, self.window.get_height()-ceil(self.size))]
@@ -114,14 +121,16 @@ class Blob:
             self.size = sqrt(self.size**2 + food.size**2).real
 
     def update(self, blobs, food):
-
         self.size -= self.energyConsumption
         self.eatCooldown = max(-1, self.eatCooldown-1)
 
         if self.target == None or self.distToPoint(self.target[0], self.target[1]) < self.speed:
             self.target = self.newTarget(self.targetRange)
+            self.makeMoveVector(self.target[0], self.target[1], self.speed)
         else:
-            self.moveTowards(self.target[0], self.target[1], self.speed)
+            self.move()
+        self.checkIfTooSmall()
+        self.checkIfTooLarge(blobs)
             
             
        
