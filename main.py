@@ -41,6 +41,7 @@ for _ in range(START_NUMBER_OF_BLOBS):
 def checkIfEaten():
     global foods
     global blobs
+
     for blob in blobs:
         if not blob.dna["meatEater"]:
             newFoods = []

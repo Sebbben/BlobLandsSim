@@ -1,4 +1,5 @@
 from math import ceil, sqrt
+import math
 import pygame
 import random
 
@@ -76,7 +77,8 @@ class Blob:
              
         
     def distToPoint(self, x,y):
-        return round(sqrt(abs(x-self.pos[0])**2 + abs(y-self.pos[+1])**2).real,2)
+        return math.dist([x,y],self.pos)
+        # return round(sqrt(abs(x-self.pos[0])**2 + abs(y-self.pos[+1])**2).real,2)
 
     def readyToSplitt(self) -> bool:
         return self.size > self.dna["maxSize"]
@@ -120,15 +122,18 @@ class Blob:
         else:
             self.size = sqrt(self.size**2 + food.size**2).real
 
+    def updateTarget(self):
+        if self.target == None or self.distToPoint(self.target[0], self.target[1]) < self.speed:
+            self.target = self.newTarget(self.targetRange)
+            self.makeMoveVector(self.target[0], self.target[1], self.speed)
+
     def update(self, blobs, food):
         self.size -= self.energyConsumption
         self.eatCooldown = max(-1, self.eatCooldown-1)
 
-        if self.target == None or self.distToPoint(self.target[0], self.target[1]) < self.speed:
-            self.target = self.newTarget(self.targetRange)
-            self.makeMoveVector(self.target[0], self.target[1], self.speed)
-        else:
-            self.move()
+        self.updateTarget()
+        self.move()
+
         self.checkIfTooSmall()
         self.checkIfTooLarge(blobs)
             
