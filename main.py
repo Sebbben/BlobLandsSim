@@ -2,7 +2,7 @@ import pygame
 import sys, random
 from blob import Blob
 from food import Food
-#import ctypes
+import cProfile, pstats
 
 
 FPS = 120 # frames per second setting
@@ -13,7 +13,6 @@ FOOD_PERC = 1/3456
 FOOD_AMOUNT = int((WIN_W*WIN_H)*FOOD_PERC)
 START_NUMBER_OF_BLOBS = 5
 START_BLOB_SIZE = 20
-MIN_BLOB_SIZE = 5
 
 lastBlobInfo = None
 paused = False
@@ -66,37 +65,9 @@ def checkIfEaten():
             blobs = newMeat
                            
             
-def checkIfRottenFood():
-    global foods
-    newFoods = []
-
-    for food in foods:
-        if food.age < food.maxAge:
-            newFoods.append(food)
-    foods = newFoods
-
-
-def checkIfTooSmall():
-    global blobs
-    newblobs = []
-    for blob in blobs:
-        if blob.size > MIN_BLOB_SIZE:
-            newblobs.append(blob)
-        else:
-            print("Tragic death:", blob.dna)
-
-    blobs = newblobs
-
-def checkIfTooLarge():
-    global blobs
-    newblobs = []
-    for blob in blobs:
-        if blob.readyToSplitt():
-            newblobs += blob.split()
-        else:
-            newblobs.append(blob)
-
-    blobs = newblobs
+def checkIfRottenFood(foods):
+    foods = [food for food in foods if food.age < food.maxAge]
+    
 
 
 def getBlobInfo():
@@ -107,26 +78,26 @@ def getBlobInfo():
     mouseX,mouseY = pygame.mouse.get_pos()
     for blob in blobs:
         if blob.distToPoint(mouseX,mouseY) < blob.size*2:
-            print(blob.dna)
             lastBlobInfo = blob.dna
 
 def update():
     global blobs
+    global foods
 
     if len(foods) < FOOD_AMOUNT:
         foods.append(Food([random.randint(0,window.get_width()), random.randint(0, window.get_height())], window))
         
-    
-    for blob in blobs:
-        blob.update()
-        
     for food in foods:
         food.update()
+    
+    for blob in blobs:
+        blob.update(blobs,food)
+    
+    blobs = [blob for blob in blobs if not blob.dead]
 
-    checkIfRottenFood()
+    checkIfRottenFood(foods)
     checkIfEaten()
-    checkIfTooSmall()
-    checkIfTooLarge()
+    
 
     
 def draw():
@@ -139,10 +110,11 @@ def draw():
         blob.draw()
 
     if pygame.font and lastBlobInfo:
-        f = pygame.font.Font(None, 64)
         text = f.render(str(lastBlobInfo),True, (0,0,0))
         textPos = text.get_rect(centerx=window.convert().get_width()/2, y=10)
         window.blit(text,textPos)
+
+        
 
 def showStats():
     global blobs
@@ -177,6 +149,22 @@ def showStats():
     else:
         print("No font :(")
 
+
+
+
+
+def p():
+    profile = cProfile.Profile()
+    profile.runcall(update)
+    ps = pstats.Stats(profile)
+    ps.print_stats()
+
+
+    exit()
+
+
+# p()
+
 while True:
     window.fill((255, 255, 255))
 
@@ -188,11 +176,14 @@ while True:
         if event.type == pygame.MOUSEBUTTONDOWN:
             getBlobInfo()
         elif event.type == pygame.KEYDOWN:
+
             if event.key == pygame.K_SPACE:
                 paused = not paused
             elif event.key == pygame.K_ESCAPE:
                 pygame.quit()
                 sys.exit()
+            elif event.key == pygame.K_BACKSPACE:
+                p()
             
 
     if not paused: update() 
