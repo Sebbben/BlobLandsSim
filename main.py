@@ -63,7 +63,7 @@ def checkIfEaten():
             for b in blobs:
                 if b.dna["meatEater"]: continue # dont be a canibal
                 if b.pos[0]<blob.pos[0]-blob.size*2 or b.pos[0]>blob.pos[0]+blob.size*2: continue # skip if blob is too far left or right of blob 
-                if blob.distTo(b.pos) < blob.size-b.size-10:
+                if blob.distTo(b.pos) < blob.size and blob.size > b.size > blob.size*(3/4):
                     blob.eat(b,FPS)
                     b.dead = True
 
@@ -165,8 +165,6 @@ def p():
 
     exit()
 
-
-# p()
 
 while True:
     window.fill((255, 255, 255))

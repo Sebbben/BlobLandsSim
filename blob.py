@@ -10,6 +10,7 @@ class Blob:
 
         self.MAX_MUTATION = 1/4
 
+        self.eatEfficiency = 1
         self.dead = False
         self.MIN_BLOB_SIZE = 5
         self.targetRange = 100
@@ -64,6 +65,8 @@ class Blob:
         if self.dna["meatEater"]:
             self.energyConsumption = 1/450
             self.color = (0,0,255)
+            self.eatCooldown = self.size * 50
+            self.eatEfficiency = 1/2
 
         self.clampMutations()
 
@@ -117,9 +120,9 @@ class Blob:
     def eat(self, food, FPS):
         if self.dna["meatEater"] and food is Blob:
             if self.eatCooldown < 0:
-                # self.eatCooldown = food.size*(FPS*0.25)
-                self.eatCooldown = 0
-                self.size = sqrt(self.size**2 + food.size**2).real
+                self.eatCooldown = food.size*(FPS*0.5)
+                # self.eatCooldown = 0
+                self.size = sqrt(self.size**2 + (food.size*self.eatEfficiency)**2).real
         else:
             self.size = sqrt(self.size**2 + food.size**2).real
 
