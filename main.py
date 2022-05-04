@@ -115,7 +115,7 @@ def update():
     if lastBlobInfo: 
         camX = lastBlobInfo.pos[0] - window.get_width()//2
         camY = lastBlobInfo.pos[1] - window.get_height()//2
-        cam.moveTo([camX, camY])
+        cam.setTarget([camX, camY])
     
     blobs = [blob for blob in blobs if not blob.dead]
 
@@ -138,6 +138,8 @@ def draw():
         text = f.render(str(lastBlobInfo.dna),True, (0,0,0))
         textPos = text.get_rect(centerx=window.convert().get_width()/2, y=10)
         window.blit(text,textPos)
+
+    cam.update()
 
         
 
@@ -232,15 +234,10 @@ while True:
             if event.key == pygame.K_s:
                 camMovingDown = False
             
-    
-    if camMovingRight:
-        cam.pos[0] += CAMERA_SPEED
-    if camMovingLeft:
-        cam.pos[0] -= CAMERA_SPEED
-    if camMovingUp:
-        cam.pos[1] -= CAMERA_SPEED
-    if camMovingDown:
-        cam.pos[1] += CAMERA_SPEED
+    camMoveX = (camMovingRight-camMovingLeft) * CAMERA_SPEED
+    camMoveY = (camMovingDown-camMovingUp) * CAMERA_SPEED
+    cam.moveTarget(camMoveX, camMoveY)
+
         
     if not paused: update() 
     else: showStats()
