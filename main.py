@@ -61,34 +61,12 @@ def checkIfEaten():
             foods = newFoods
         else:
             for b in blobs:
+                if b.dna["meatEater"]: continue # dont be a canibal
                 if b.pos[0]<blob.pos[0]-blob.size*2 or b.pos[0]>blob.pos[0]+blob.size*2: continue # skip if blob is too far left or right of blob 
-                if blob.distTo(b.pos) < blob.size-(b.size):
+                if blob.distTo(b.pos) < blob.size-b.size-10:
                     blob.eat(b,FPS)
                     b.dead = True
 
-
-    # for blob in blobs:
-    #     if not blob.dna["meatEater"]:
-    #         newFoods = []
-    #         for food in foods:
-    #             if blob.size > blob.distToPoint(food.pos[0], food.pos[1]):
-    #                 blob.eat(food,FPS)
-    #             else:
-    #                 newFoods.append(food)
-    #         foods = newFoods
-
-    #     else:
-    #         newMeat = []
-    #         for meat in blobs:
-    #             if blob == meat: 
-    #                 newMeat.append(meat)
-    #                 continue
-    #             if blob.size > blob.distToPoint(meat.pos[0], meat.pos[1]) and blob.size > meat.size-10 and not meat.dna["meatEater"]:  
-    #                 blob.eat(meat, FPS)
-    #             else:
-    #                 newMeat.append(meat)
-
-    #         blobs = newMeat
                            
             
 def checkIfRottenFood():
@@ -209,6 +187,12 @@ while True:
                 sys.exit()
             elif event.key == pygame.K_BACKSPACE:
                 p()
+            elif event.key == pygame.K_f:
+                blobs = [blob for blob in blobs if random.randint(0,2)]
+            elif event.key == pygame.K_UP:
+                FPS += 10
+            elif event.key == pygame.K_DOWN:
+                FPS -= 10
             
 
     if not paused: update() 
