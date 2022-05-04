@@ -9,15 +9,24 @@ FPS = 120 # frames per second setting
 WIN_W = 1920
 WIN_H = 1080
 
-FOOD_PERC = 1/3456
-FOOD_AMOUNT = int((WIN_W*WIN_H)*FOOD_PERC)
+SIMULATION_SIZE = [10000, 10000]
+FOOD_DENCITY = 1/3456
+FOOD_AMOUNT = int((SIMULATION_SIZE[0]*SIMULATION_SIZE[1])*FOOD_DENCITY)
 START_NUMBER_OF_BLOBS = 5
 START_BLOB_SIZE = 20
+CAMERA_SPEED = 10
 
 lastBlobInfo = None
 paused = False
 
+camMovingRight = False
+camMovingLeft = False
+camMovingUp = False
+camMovingDown = False
+
 pygame.init()
+
+
 
 # window = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
 window = pygame.display.set_mode((1920, 1080), pygame.SCALED)
@@ -28,14 +37,16 @@ fpsClock = pygame.time.Clock()
 blobs = []
 foods = []
 
+cameraPos = [window.get_width()/2, window.get_height()/2]
+
 #ctypes.windll.shcore.SetProcessDpiAwareness(1)
 
 for _ in range(FOOD_AMOUNT//2):
-    foods.append(Food([random.randint(0,window.get_width()), random.randint(0, window.get_height())], window, age=random.randint(0,FPS*20)))
+    foods.append(Food(window,SIMULATION_SIZE, age=random.randint(0,FPS*20)))
 
 
 for _ in range(START_NUMBER_OF_BLOBS):
-    blobs.append(Blob(START_BLOB_SIZE,[random.randint(0,window.get_width()), random.randint(0, window.get_height())], window))
+    blobs.append(Blob(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], window, SIMULATION_SIZE))
     # blobs.append(Blob(START_BLOB_SIZE,[window.get_width()//2, window.get_height()//2], window))
 
 def checkIfEaten():
@@ -88,7 +99,7 @@ def update():
     global foods
 
     if len(foods) < FOOD_AMOUNT:
-        foods.append(Food([random.randint(0,window.get_width()), random.randint(0, window.get_height())], window))
+        foods.append(Food(window, SIMULATION_SIZE))
         
     for food in foods:
         food.update()
@@ -107,12 +118,13 @@ def draw():
     global lastBlobInfo
 
     for food in foods:
-        food.draw()
+        food.draw(cameraPos)
     
     for blob in blobs:
-        blob.draw()
+        blob.draw(cameraPos)
 
     if pygame.font and lastBlobInfo:
+        f = pygame.font.Font(None, 32)
         text = f.render(str(lastBlobInfo),True, (0,0,0))
         textPos = text.get_rect(centerx=window.convert().get_width()/2, y=10)
         window.blit(text,textPos)
@@ -191,8 +203,34 @@ while True:
                 FPS += 10
             elif event.key == pygame.K_DOWN:
                 FPS -= 10
+            if event.key == pygame.K_d:
+                camMovingRight = True
+            if event.key == pygame.K_a:
+                camMovingLeft = True
+            if event.key == pygame.K_w:
+                camMovingUp = True
+            if event.key == pygame.K_s:
+                camMovingDown = True
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_d:
+                camMovingRight = False
+            if event.key == pygame.K_a:
+                camMovingLeft = False
+            if event.key == pygame.K_w:
+                camMovingUp = False
+            if event.key == pygame.K_s:
+                camMovingDown = False
             
-
+    
+    if camMovingRight:
+        cameraPos[0] += CAMERA_SPEED
+    if camMovingLeft:
+        cameraPos[0] -= CAMERA_SPEED
+    if camMovingUp:
+        cameraPos[1] -= CAMERA_SPEED
+    if camMovingDown:
+        cameraPos[1] += CAMERA_SPEED
+        
     if not paused: update() 
     else: showStats()
     draw()    

@@ -4,7 +4,7 @@ import pygame
 import random
 
 class Blob:
-    def __init__(self, size:float, pos:list, window, dna = {}) -> None:
+    def __init__(self, size:float, pos:list, window, SIMULATION_SIZE:list, dna = {}) -> None:
         self.pos = pos
         self.size = size
 
@@ -20,6 +20,8 @@ class Blob:
         self.energyConsumption = 1/100
 
         self.eatCooldown = self.size*3
+        
+        self.SIMULATION_SIZE = SIMULATION_SIZE
 
         self.dnaClamp = {
             "maxSize":[30, 100],
@@ -70,8 +72,9 @@ class Blob:
 
         self.clampMutations()
 
-    def draw(self):
-        pygame.draw.circle(self.window, self.color, [int(self.pos[0]), int(self.pos[1])], round(self.size))
+    def draw(self, cameraPos):
+        cameraX, cameraY = cameraPos
+        pygame.draw.circle(self.window, self.color, [int(self.pos[0]) - cameraX, int(self.pos[1]) - cameraY], round(self.size))
 
 
     def move(self):
@@ -89,7 +92,7 @@ class Blob:
     def split(self):
         newBlobs = []
         for _ in range(self.dna["splittNumber"]):
-            newBlobs.append(Blob(self.size//self.dna["splittNumber"], [self.pos[0]+random.randint(0,self.size//self.dna["splittNumber"]),self.pos[1]+random.randint(0,self.size//self.dna["splittNumber"])].copy(), self.window, self.dna.copy()))
+            newBlobs.append(Blob(self.size//self.dna["splittNumber"], [self.pos[0]+random.randint(0,self.size//self.dna["splittNumber"]),self.pos[1]+random.randint(0,self.size//self.dna["splittNumber"])].copy(), self.window, self.SIMULATION_SIZE, self.dna.copy()))
         return newBlobs
 
     def makeMoveVector(self, x, y, steps):
@@ -115,7 +118,7 @@ class Blob:
             blobs += self.split()
 
     def newTarget(self, r):
-        return [random.randint(0,self.window.get_width()-ceil(self.size)), random.randint(0, self.window.get_height()-ceil(self.size))]
+        return [random.randint(0,self.SIMULATION_SIZE[0]-ceil(self.size)), random.randint(0, self.SIMULATION_SIZE[1]-ceil(self.size))]
         
     def eat(self, food, FPS):
         if self.dna["meatEater"] and food is Blob:
