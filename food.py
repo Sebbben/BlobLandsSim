@@ -17,8 +17,8 @@ class Food:
     def update(self):
         self.age += 1
 
-    def draw(self, cameraPos):
-        cameraX, cameraY = cameraPos
+    def draw(self, camera):
+        cameraX, cameraY = camera.pos
         pygame.draw.circle(self.window, self.color, [self.pos[0]-cameraX, self.pos[1]-cameraY], self.size)
     
     def notRotten(self):

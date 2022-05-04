@@ -72,8 +72,8 @@ class Blob:
 
         self.clampMutations()
 
-    def draw(self, cameraPos):
-        cameraX, cameraY = cameraPos
+    def draw(self, camera):
+        cameraX, cameraY = camera.pos
         pygame.draw.circle(self.window, self.color, [int(self.pos[0]) - cameraX, int(self.pos[1]) - cameraY], round(self.size))
 
 

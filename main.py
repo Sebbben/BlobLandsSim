@@ -3,7 +3,7 @@ import sys, random
 from blob import Blob
 from food import Food
 import cProfile, pstats
-
+from camera import Camera
 
 FPS = 120 # frames per second setting
 WIN_W = 1920
@@ -23,6 +23,8 @@ camMovingRight = False
 camMovingLeft = False
 camMovingUp = False
 camMovingDown = False
+
+cam = Camera()
 
 pygame.init()
 
@@ -90,8 +92,8 @@ def getBlobInfo():
 
     lastBlobInfo = None
     mouseX, mouseY = pygame.mouse.get_pos()
-    mouseX += cameraPos[0]
-    mouseY += cameraPos[1]
+    mouseX += cam.pos[0]
+    mouseY += cam.pos[1]
 
     for blob in blobs:
         if blob.distTo([mouseX,mouseY]) < blob.size*2:
@@ -100,7 +102,6 @@ def getBlobInfo():
 def update():
     global blobs
     global foods
-    global cameraPos
 
     if len(foods) < FOOD_AMOUNT:
         foods.append(Food(window, SIMULATION_SIZE))
@@ -114,7 +115,7 @@ def update():
     if lastBlobInfo: 
         camX = lastBlobInfo.pos[0] - window.get_width()//2
         camY = lastBlobInfo.pos[1] - window.get_height()//2
-        cameraPos = [camX, camY]
+        cam.moveTo([camX, camY])
     
     blobs = [blob for blob in blobs if not blob.dead]
 
@@ -125,13 +126,12 @@ def update():
     
 def draw():
     global lastBlobInfo
-    global cameraPos
 
     for food in foods:
-        food.draw(cameraPos)
+        food.draw(cam)
     
     for blob in blobs:
-        blob.draw(cameraPos)
+        blob.draw(cam)
 
     if pygame.font and lastBlobInfo:
         f = pygame.font.Font(None, 32)
@@ -213,6 +213,7 @@ while True:
                 FPS += 10
             elif event.key == pygame.K_DOWN:
                 FPS -= 10
+
             if event.key == pygame.K_d:
                 camMovingRight = True
             if event.key == pygame.K_a:
@@ -233,13 +234,13 @@ while True:
             
     
     if camMovingRight:
-        cameraPos[0] += CAMERA_SPEED
+        cam.pos[0] += CAMERA_SPEED
     if camMovingLeft:
-        cameraPos[0] -= CAMERA_SPEED
+        cam.pos[0] -= CAMERA_SPEED
     if camMovingUp:
-        cameraPos[1] -= CAMERA_SPEED
+        cam.pos[1] -= CAMERA_SPEED
     if camMovingDown:
-        cameraPos[1] += CAMERA_SPEED
+        cam.pos[1] += CAMERA_SPEED
         
     if not paused: update() 
     else: showStats()
