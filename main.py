@@ -4,6 +4,9 @@ from blob import Blob
 from food import Food
 import cProfile, pstats
 from camera import Camera
+from carnivore import Carnivore
+from herbivore import Herbivore
+from parasite import Parasite
 
 FPS = 120 # frames per second setting
 WIN_W = 1920
@@ -41,15 +44,19 @@ foods = []
 
 cameraPos = [window.get_width()/2, window.get_height()/2]
 
-#ctypes.windll.shcore.SetProcessDpiAwareness(1)
 
 for _ in range(FOOD_AMOUNT//2):
     foods.append(Food(window,SIMULATION_SIZE, age=random.randint(0,FPS*20)))
 
 
 for _ in range(START_NUMBER_OF_BLOBS):
-    blobs.append(Blob(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], window, SIMULATION_SIZE))
-    # blobs.append(Blob(START_BLOB_SIZE,[window.get_width()//2, window.get_height()//2], window))
+    blob = Blob(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], window, SIMULATION_SIZE)
+    if blob.type == "Carnivore":
+        blob.__class__ = Carnivore
+    elif blob.type == "Herbivore":
+        blob.__class__ = Herbivore
+
+    blobs.append(blob)
 
 def checkIfEaten():
     global foods
@@ -61,7 +68,7 @@ def checkIfEaten():
 
 
     for blob in blobs:
-        if not blob.dna["meatEater"]:
+        if blob.type == "Herbivore":
             newFoods = []
             for food in foods:
                 if food.pos[0]<blob.pos[0]-blob.size*2 or food.pos[0]>blob.pos[0]+blob.size*2: # skip if food is too far left or right of blob
@@ -74,7 +81,7 @@ def checkIfEaten():
             foods = newFoods
         else:
             for b in blobs:
-                if b.dna["meatEater"]: continue # dont be a canibal
+                if b.type == "Carnivore": continue # dont be a canibal
                 if b.pos[0]<blob.pos[0]-blob.size*2 or b.pos[0]>blob.pos[0]+blob.size*2: continue # skip if blob is too far left or right of blob 
                 if blob.distTo(b.pos) < blob.size and blob.size > b.size > blob.size*(3/4):
                     blob.eat(b,FPS)
@@ -92,10 +99,10 @@ def getBlobInfo():
 
     lastBlobInfo = None
     mouseX, mouseY = pygame.mouse.get_pos()
-    mouseX *= cam.zoomLvl
-    mouseY *= cam.zoomLvl
     mouseX += cam.pos[0]
     mouseY += cam.pos[1]
+    mouseX *= cam.zoomLvl
+    mouseY *= cam.zoomLvl
 
     for blob in blobs:
         if blob.distTo([mouseX,mouseY]) < blob.size*2:
@@ -125,7 +132,6 @@ def update():
     checkIfRottenFood()
     checkIfEaten()
     
-
     
 def draw():
     global lastBlobInfo
@@ -157,7 +163,7 @@ def showStats():
         "splittNumber": [],
     }
     for blob in blobs:
-        if blob.dna["meatEater"]:
+        if blob.type == "Carnivore":
             avrgMeatEaterDna["maxSize"].append(blob.dna["maxSize"])
             avrgMeatEaterDna["splittNumber"].append(blob.dna["splittNumber"])
         else:
