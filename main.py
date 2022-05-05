@@ -61,7 +61,7 @@ def checkIfEaten():
 
 
     for blob in blobs:
-        if not blob.dna["meatEater"]:
+        if blob.dna["type"] == "Herbivore":
             newFoods = []
             for food in foods:
                 if food.pos[0]<blob.pos[0]-blob.size*2 or food.pos[0]>blob.pos[0]+blob.size*2: # skip if food is too far left or right of blob
@@ -74,7 +74,7 @@ def checkIfEaten():
             foods = newFoods
         else:
             for b in blobs:
-                if b.dna["meatEater"]: continue # dont be a canibal
+                if b.dna["type"] == "Carnivore": continue # dont be a canibal
                 if b.pos[0]<blob.pos[0]-blob.size*2 or b.pos[0]>blob.pos[0]+blob.size*2: continue # skip if blob is too far left or right of blob 
                 if blob.distTo(b.pos) < blob.size and blob.size > b.size > blob.size*(3/4):
                     blob.eat(b,FPS)
@@ -157,7 +157,7 @@ def showStats():
         "splittNumber": [],
     }
     for blob in blobs:
-        if blob.dna["meatEater"]:
+        if blob.dna["type"] == "Carnivore":
             avrgMeatEaterDna["maxSize"].append(blob.dna["maxSize"])
             avrgMeatEaterDna["splittNumber"].append(blob.dna["splittNumber"])
         else:

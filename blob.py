@@ -34,8 +34,8 @@ class Blob:
             self.dna = {
                 "maxSize": 40,
                 "splittNumber": 2,
-                #"meatEater":bool(random.randint(0,2))
-                "meatEater":False
+                #"type":bool(random.randint(0,2))
+                "type":False
             }
 
 
@@ -62,9 +62,9 @@ class Blob:
             self.dna[geneToMod] += random.randint(-int(self.dna[geneToMod]*self.MAX_MUTATION),int(self.dna[geneToMod]*self.MAX_MUTATION))
 
         if (random.randint(0, 60) == 2):
-            self.dna["meatEater"] = not self.dna["meatEater"]
+            self.dna["type"] = "Carnivore" if self.dna["type"] == "Herbivore" else "Herbivore"
             
-        if self.dna["meatEater"]:
+        if self.dna["type"] == "Carnivore":
             self.energyConsumption = 1/450
             self.color = (0,0,255)
             self.eatCooldown = self.size * 50
@@ -121,7 +121,7 @@ class Blob:
         return [random.randint(0,self.SIMULATION_SIZE[0]-ceil(self.size)), random.randint(0, self.SIMULATION_SIZE[1]-ceil(self.size))]
         
     def eat(self, food, FPS):
-        if self.dna["meatEater"] and food is Blob:
+        if self.dna["type"] == "Carnivore" and food is Blob:
             if self.eatCooldown < 0:
                 self.eatCooldown = food.size*(FPS*0.5)
                 # self.eatCooldown = 0
