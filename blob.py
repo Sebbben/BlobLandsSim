@@ -74,7 +74,7 @@ class Blob:
 
     def draw(self, camera):
         cameraX, cameraY = camera.pos
-        pygame.draw.circle(self.window, self.color, [int(self.pos[0]) - cameraX, int(self.pos[1]) - cameraY], round(self.size))
+        pygame.draw.circle(self.window, self.color, [int(self.pos[0]*camera.zoomLvl) - cameraX, int(self.pos[1]*camera.zoomLvl) - cameraY], round(self.size*camera.zoomLvl))
 
 
     def move(self):

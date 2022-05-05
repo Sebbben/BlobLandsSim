@@ -9,7 +9,7 @@ FPS = 120 # frames per second setting
 WIN_W = 1920
 WIN_H = 1080
 
-SIMULATION_SIZE = [2000, 2000]
+SIMULATION_SIZE = [1500, 1500]
 FOOD_DENCITY = 1/3456
 FOOD_AMOUNT = int((SIMULATION_SIZE[0]*SIMULATION_SIZE[1])*FOOD_DENCITY)
 START_NUMBER_OF_BLOBS = 5
@@ -92,12 +92,15 @@ def getBlobInfo():
 
     lastBlobInfo = None
     mouseX, mouseY = pygame.mouse.get_pos()
+    mouseX *= cam.zoomLvl
+    mouseY *= cam.zoomLvl
     mouseX += cam.pos[0]
     mouseY += cam.pos[1]
 
     for blob in blobs:
         if blob.distTo([mouseX,mouseY]) < blob.size*2:
             lastBlobInfo = blob
+            cam.zoomTarget = 1
 
 def update():
     global blobs
@@ -215,6 +218,10 @@ while True:
                 FPS += 10
             elif event.key == pygame.K_DOWN:
                 FPS -= 10
+            elif event.key == pygame.K_RIGHT:
+                cam.zoom(0.1)
+            elif event.key == pygame.K_LEFT:
+                cam.zoom(-0.1)
 
             if event.key == pygame.K_d:
                 camMovingRight = True
