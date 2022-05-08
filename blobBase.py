@@ -1,11 +1,7 @@
-from math import ceil, sqrt
-import math
-import pygame
-import random
+import random, pygame
+from math import sqrt, ceil, dist
 
-
-
-class Blob:
+class BlobBase:
     def __init__(self, size:float, pos:list, window, SIMULATION_SIZE:list, dna = {}) -> None:
         self.pos = pos
         self.size = size
@@ -24,25 +20,8 @@ class Blob:
         self.eatCooldown = self.size*3
         
         self.SIMULATION_SIZE = SIMULATION_SIZE
+        self.window = window    
 
-        self.dnaClamp = {
-            "maxSize":[30, 100],
-            "splittNumber": [2,8]
-        }
-
-        if dna:
-            self.dna = dna
-        else:
-            self.dna = {
-                "maxSize": 40,
-                "splittNumber": 2,
-                #"type":bool(random.randint(0,2))
-                "type":"Herbivore"
-            }
-
-
-        
-        self.window = window
 
     def clampMutations(self):
         for key in self.dna:
@@ -85,17 +64,18 @@ class Blob:
              
         
     def distTo(self, otherPos):
-        return math.dist(otherPos,self.pos)
+        return dist(otherPos,self.pos)
         # return round(sqrt(abs(x-self.pos[0])**2 + abs(y-self.pos[+1])**2).real,2)
 
     def readyToSplitt(self) -> bool:
         return self.size > self.dna["maxSize"]
 
     def split(self):
+        self.mutate()
+
         newBlobs = []
         for _ in range(self.dna["splittNumber"]):
-            self.mutate()
-            blob = Blob(self.size//self.dna["splittNumber"], [self.pos[0]+random.randint(0,self.size//self.dna["splittNumber"]),self.pos[1]+random.randint(0,self.size//self.dna["splittNumber"])].copy(), self.window, self.SIMULATION_SIZE, self.dna.copy())
+            blob = BlobBase(self.size//self.dna["splittNumber"], [self.pos[0]+random.randint(0,self.size//self.dna["splittNumber"]),self.pos[1]+random.randint(0,self.size//self.dna["splittNumber"])].copy(), self.window, self.SIMULATION_SIZE, self.dna.copy())
             newBlobs.append(blob)
         return newBlobs
 
@@ -125,7 +105,7 @@ class Blob:
         return [random.randint(0,self.SIMULATION_SIZE[0]-ceil(self.size)), random.randint(0, self.SIMULATION_SIZE[1]-ceil(self.size))]
         
     def eat(self, food, FPS):
-        if self.dna["type"] == "Carnivore" and food is Blob:
+        if self.dna["type"] == "Carnivore" and food is BlobBase:
             if self.eatCooldown < 0:
                 self.eatCooldown = food.size*(FPS*0.5)
                 # self.eatCooldown = 0

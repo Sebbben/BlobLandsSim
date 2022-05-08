@@ -51,11 +51,6 @@ for _ in range(FOOD_AMOUNT//2):
 
 for _ in range(START_NUMBER_OF_BLOBS):
     blob = Blob(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], window, SIMULATION_SIZE)
-    if blob.type == "Carnivore":
-        blob.__class__ = Carnivore
-    elif blob.type == "Herbivore":
-        blob.__class__ = Herbivore
-
     blobs.append(blob)
 
 def checkIfEaten():
