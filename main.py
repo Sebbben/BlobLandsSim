@@ -34,7 +34,7 @@ pygame.init()
 
 
 # window = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
-window = pygame.display.set_mode((1920, 1080), pygame.SCALED)
+window = pygame.display.set_mode((1080, 720), pygame.RESIZABLE)
 
 fpsClock = pygame.time.Clock()
 
@@ -183,6 +183,42 @@ def p():
     exit()
 
 
+def handleMouseUp(event):
+    if event.button == 1:
+        getBlobInfo()
+
+def handleMouseDown(event):
+    if event.button == 4:
+        cam.zoom(0.1)
+    elif event.button == 5:
+        cam.zoom(-0.1)
+
+def handleKeyDown(event):
+    pass
+
+
+def handleKeyUp(event):
+    if event.key == pygame.K_SPACE:
+        paused = not paused
+    elif event.key == pygame.K_ESCAPE:
+        pygame.quit()
+        sys.exit()
+    elif event.key == pygame.K_BACKSPACE:
+        p()
+    elif event.key == pygame.K_f:
+        blobs = [blob for blob in blobs if random.randint(0,2)]
+    elif event.key == pygame.K_UP:
+        SPEED += 0.1
+        print(SPEED)
+    elif event.key == pygame.K_DOWN:
+        SPEED -= 0.1
+        print(SPEED)
+    elif event.key == pygame.K_RIGHT:
+        cam.zoom(0.1)
+    elif event.key == pygame.K_LEFT:
+        cam.zoom(-0.1)
+
+
 while True:
     window.fill((255, 255, 255))
 
@@ -192,51 +228,31 @@ while True:
             sys.exit()
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            getBlobInfo()
+            handleMouseDown(event)
+        elif event.type == pygame.MOUSEBUTTONUP:
+            handleMouseUp(event)
         elif event.type == pygame.KEYDOWN:
-
-            if event.key == pygame.K_SPACE:
-                paused = not paused
-            elif event.key == pygame.K_ESCAPE:
-                pygame.quit()
-                sys.exit()
-            elif event.key == pygame.K_BACKSPACE:
-                p()
-            elif event.key == pygame.K_f:
-                blobs = [blob for blob in blobs if random.randint(0,2)]
-            elif event.key == pygame.K_UP:
-                SPEED += 0.1
-                print(SPEED)
-            elif event.key == pygame.K_DOWN:
-                SPEED -= 0.1
-                print(SPEED)
-            elif event.key == pygame.K_RIGHT:
-                cam.zoom(0.1)
-            elif event.key == pygame.K_LEFT:
-                cam.zoom(-0.1)
-
-            if event.key == pygame.K_d:
-                camMovingRight = True
-            if event.key == pygame.K_a:
-                camMovingLeft = True
-            if event.key == pygame.K_w:
-                camMovingUp = True
-            if event.key == pygame.K_s:
-                camMovingDown = True
+            handleKeyDown(event)
         elif event.type == pygame.KEYUP:
-            if event.key == pygame.K_d:
-                camMovingRight = False
-            if event.key == pygame.K_a:
-                camMovingLeft = False
-            if event.key == pygame.K_w:
-                camMovingUp = False
-            if event.key == pygame.K_s:
-                camMovingDown = False
+            handleKeyUp(event)
+
             
+    keys = pygame.key.get_pressed()
+
+    camMovingLeft = keys[pygame.K_a]
+    camMovingRight = keys[pygame.K_d]
+    camMovingUp = keys[pygame.K_w]
+    camMovingDown = keys[pygame.K_s]
+
+
     camMoveX = (camMovingRight-camMovingLeft) * CAMERA_SPEED
     camMoveY = (camMovingDown-camMovingUp) * CAMERA_SPEED
-    cam.moveTarget(camMoveX, camMoveY)
 
+    mouseMovement = pygame.mouse.get_rel() # needs to get called every frame to get accurate readings
+    if pygame.mouse.get_pressed()[0]:
+        cam.moveTarget(-mouseMovement[0], -mouseMovement[1])
+        
+    cam.moveTarget(camMoveX, camMoveY)
         
     if not paused: update() 
     else: showStats()
