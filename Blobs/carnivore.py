@@ -42,15 +42,14 @@ class Carnivore(Blob):
         self.pos[1] += self.yMove * self.gamespeed
 
     def eat(self, blobs, FPS):
-
         for b in blobs:
-                if b.dna["type"] == "Carnivore": continue # dont be a canibal
-                if b.pos[0]<self.pos[0]-self.size*2 or b.pos[0]>self.pos[0]+self.size*2: continue # skip if self is too far left or right of self 
-                if self.distTo(b.pos) < self.size and self.size > b.size > self.size*(0/4):
-                    if b is Herbivore and self.eatCooldown < 0:
-                        self.eatCooldown = b.size*(FPS*0.5)
-                        # self.eatCooldown = 0
-                        self.size = sqrt(self.size**2 + (b.size*self.eatEfficiency)**2).real
-                    b.dead = True
+            if b.dna["type"] == "Carnivore": continue # dont be a canibal
+            if b.pos[0]<self.pos[0]-self.size*2 or b.pos[0]>self.pos[0]+self.size*2: continue # skip if self is too far left or right of self 
+            if self.distTo(b.pos) < self.size and self.size > b.size > self.size*(0/4):
+                if b is Herbivore and self.eatCooldown < 0:
+                    self.eatCooldown = b.size*(FPS*0.5)
+                    # self.eatCooldown = 0
+                    self.size = sqrt(self.size**2 + (b.size*self.eatEfficiency)**2).real
+                b.dead = True
 
         

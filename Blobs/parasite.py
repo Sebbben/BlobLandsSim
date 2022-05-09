@@ -2,8 +2,6 @@ import random
 from Blobs.blob import Blob
 from math import sqrt
 
-from Blobs.carnivore import Carnivore
-
 class Parasite(Blob):
     def __init__(self, size:float, pos:list, window, SIMULATION_SIZE:list, dna = {}):
         super().__init__(size, pos, window, SIMULATION_SIZE, dna)
@@ -11,6 +9,7 @@ class Parasite(Blob):
         self.color = (255,255,0)
         self.host = None
         self.leachAmount = 10
+        self.energyConsumption = 1/1000
 
     def split(self):
         from Blobs.carnivore import Carnivore
@@ -36,14 +35,14 @@ class Parasite(Blob):
         self.updateHost(blobs)
 
     def updateHost(self,blobs):
-        if self.host and self.host.size > 10: return # skip if has host and host is large enough
+        if self.host and self.host.size > self.size: return # skip trying to get new host if it allready has one that is large enough
         self.host = None
         for blob in blobs:
-            if isinstance(blob, Carnivore):
-                if blob.pos[0]<self.pos[0]-self.size*2 or blob.pos[0]>self.pos[0]+self.size*2: continue # skip if self is too far left or right of self 
-                if self.distTo(blob.pos) < self.size and blob.size > 10:
-                    self.host = blob
-                    break
+            if blob.pos[0]<self.pos[0]-self.size*2 or blob.pos[0]>self.pos[0]+self.size*2: continue # skip if self is too far left or right of self 
+            if self.distTo(blob.pos) < self.size:
+                self.host = blob
+                print("found host")
+                break
 
 
 

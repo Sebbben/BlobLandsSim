@@ -1,5 +1,6 @@
+from tkinter.tix import WINDOW
 import pygame
-import sys, random
+import sys, random, math
 from Blobs.carnivore import Carnivore
 from Blobs.herbivore import Herbivore
 from Blobs.parasite import Parasite
@@ -18,6 +19,7 @@ START_NUMBER_OF_BLOBS = 5
 START_BLOB_SIZE = 20
 CAMERA_SPEED = 10
 SPEED = 1
+WINDOW_RES = (1080,720)
 
 lastBlobInfo = None
 paused = False
@@ -29,12 +31,20 @@ camMovingDown = False
 
 cam = Camera()
 
+cam.zoomTarget -= 0.6
+cam.zoomLvl -= 0.6
+
+cam.pos[0] =    -(WINDOW_RES[0] - (SIMULATION_SIZE[0]*cam.zoomLvl))//2
+cam.pos[1] =    -(WINDOW_RES[1] - (SIMULATION_SIZE[1]*cam.zoomLvl))//2
+cam.target[0] = -(WINDOW_RES[0] - (SIMULATION_SIZE[0]*cam.zoomLvl))//2
+cam.target[1] = -(WINDOW_RES[1] - (SIMULATION_SIZE[1]*cam.zoomLvl))//2
+
 pygame.init()
 
 
 
 # window = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
-window = pygame.display.set_mode((1080, 720), pygame.RESIZABLE)
+window = pygame.display.set_mode(WINDOW_RES, pygame.RESIZABLE)
 
 fpsClock = pygame.time.Clock()
 
@@ -83,13 +93,12 @@ def getBlobInfo():
 
     lastBlobInfo = None
     mouseX, mouseY = pygame.mouse.get_pos()
-    mouseX += cam.pos[0]
-    mouseY += cam.pos[1]
-    mouseX *= cam.zoomLvl
-    mouseY *= cam.zoomLvl
 
     for blob in blobs:
-        if blob.distTo([mouseX,mouseY]) < blob.size*2:
+        blobX = (blob.pos[0]*cam.zoomLvl)-cam.pos[0]
+        blobY = (blob.pos[1]*cam.zoomLvl)-cam.pos[1]
+
+        if math.dist([blobX,blobY], [mouseX,mouseY]) < blob.size:
             lastBlobInfo = blob
             cam.zoomTarget = 1
 
@@ -107,6 +116,8 @@ def update():
         blob.update(blobs,food,SPEED)
 
     if lastBlobInfo: 
+        blobX = (blob.pos[0]*cam.zoomLvl)-cam.pos[0]
+        blobY = (blob.pos[1]*cam.zoomLvl)-cam.pos[1]
         camX = lastBlobInfo.pos[0] - window.get_width()//2
         camY = lastBlobInfo.pos[1] - window.get_height()//2
         cam.setTarget([camX, camY])
@@ -198,7 +209,9 @@ def handleKeyDown(event):
 
 
 def handleKeyUp(event):
+    global SPEED
     if event.key == pygame.K_SPACE:
+        global paused
         paused = not paused
     elif event.key == pygame.K_ESCAPE:
         pygame.quit()
@@ -209,15 +222,30 @@ def handleKeyUp(event):
         blobs = [blob for blob in blobs if random.randint(0,2)]
     elif event.key == pygame.K_UP:
         SPEED += 0.1
-        print(SPEED)
     elif event.key == pygame.K_DOWN:
         SPEED -= 0.1
-        print(SPEED)
     elif event.key == pygame.K_RIGHT:
         cam.zoom(0.1)
     elif event.key == pygame.K_LEFT:
         cam.zoom(-0.1)
 
+def updateCam():
+    keys = pygame.key.get_pressed()
+
+    camMovingLeft = keys[pygame.K_a]
+    camMovingRight = keys[pygame.K_d]
+    camMovingUp = keys[pygame.K_w]
+    camMovingDown = keys[pygame.K_s]
+
+
+    camMoveX = (camMovingRight-camMovingLeft) * CAMERA_SPEED
+    camMoveY = (camMovingDown-camMovingUp) * CAMERA_SPEED
+
+    mouseMovement = pygame.mouse.get_rel() # needs to get called every frame to get accurate readings
+    if pygame.mouse.get_pressed()[0]:
+        cam.moveTarget(-mouseMovement[0], -mouseMovement[1])
+        
+    cam.moveTarget(camMoveX, camMoveY)
 
 while True:
     window.fill((255, 255, 255))
@@ -236,23 +264,8 @@ while True:
         elif event.type == pygame.KEYUP:
             handleKeyUp(event)
 
-            
-    keys = pygame.key.get_pressed()
+    updateCam()
 
-    camMovingLeft = keys[pygame.K_a]
-    camMovingRight = keys[pygame.K_d]
-    camMovingUp = keys[pygame.K_w]
-    camMovingDown = keys[pygame.K_s]
-
-
-    camMoveX = (camMovingRight-camMovingLeft) * CAMERA_SPEED
-    camMoveY = (camMovingDown-camMovingUp) * CAMERA_SPEED
-
-    mouseMovement = pygame.mouse.get_rel() # needs to get called every frame to get accurate readings
-    if pygame.mouse.get_pressed()[0]:
-        cam.moveTarget(-mouseMovement[0], -mouseMovement[1])
-        
-    cam.moveTarget(camMoveX, camMoveY)
         
     if not paused: update() 
     else: showStats()
