@@ -1,12 +1,11 @@
 import pygame
 import sys, random
-from blob import Blob
+from Blobs.carnivore import Carnivore
+from Blobs.herbivore import Herbivore
+from Blobs.parasite import Parasite
 from food import Food
 import cProfile, pstats
 from camera import Camera
-from carnivore import Carnivore
-from herbivore import Herbivore
-from parasite import Parasite
 
 FPS = 120 # frames per second setting
 WIN_W = 1920
@@ -18,6 +17,7 @@ FOOD_AMOUNT = int((SIMULATION_SIZE[0]*SIMULATION_SIZE[1])*FOOD_DENCITY)
 START_NUMBER_OF_BLOBS = 5
 START_BLOB_SIZE = 20
 CAMERA_SPEED = 10
+SPEED = 1
 
 lastBlobInfo = None
 paused = False
@@ -50,7 +50,7 @@ for _ in range(FOOD_AMOUNT//2):
 
 
 for _ in range(START_NUMBER_OF_BLOBS):
-    blob = Blob(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], window, SIMULATION_SIZE)
+    blob = Herbivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], window, SIMULATION_SIZE)
     blobs.append(blob)
 
 def checkIfEaten():
@@ -63,24 +63,13 @@ def checkIfEaten():
 
 
     for blob in blobs:
-        if blob.dna["type"] == "Herbivore":
-            newFoods = []
-            for food in foods:
-                if food.pos[0]<blob.pos[0]-blob.size*2 or food.pos[0]>blob.pos[0]+blob.size*2: # skip if food is too far left or right of blob
-                    newFoods.append(food)
-                    continue 
-                if blob.distTo(food.pos) < blob.size-(food.size):
-                    blob.eat(food,FPS)
-                else:
-                    newFoods.append(food)
-            foods = newFoods
-        else:
-            for b in blobs:
-                if b.dna["type"] == "Carnivore": continue # dont be a canibal
-                if b.pos[0]<blob.pos[0]-blob.size*2 or b.pos[0]>blob.pos[0]+blob.size*2: continue # skip if blob is too far left or right of blob 
-                if blob.distTo(b.pos) < blob.size and blob.size > b.size > blob.size*(3/4):
-                    blob.eat(b,FPS)
-                    b.dead = True
+        if isinstance(blob, Herbivore):
+            blob.eat(foods)
+        elif isinstance(blob, Carnivore):
+            blob.eat(blobs,FPS)
+        elif isinstance(blob, Parasite):
+            blob.eat()
+            
 
                            
             
@@ -115,7 +104,7 @@ def update():
         food.update()
     
     for blob in blobs:
-        blob.update(blobs,food)
+        blob.update(blobs,food,SPEED)
 
     if lastBlobInfo: 
         camX = lastBlobInfo.pos[0] - window.get_width()//2
@@ -216,9 +205,11 @@ while True:
             elif event.key == pygame.K_f:
                 blobs = [blob for blob in blobs if random.randint(0,2)]
             elif event.key == pygame.K_UP:
-                FPS += 10
+                SPEED += 0.1
+                print(SPEED)
             elif event.key == pygame.K_DOWN:
-                FPS -= 10
+                SPEED -= 0.1
+                print(SPEED)
             elif event.key == pygame.K_RIGHT:
                 cam.zoom(0.1)
             elif event.key == pygame.K_LEFT:
