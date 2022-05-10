@@ -1,3 +1,4 @@
+from abc import abstractclassmethod
 from math import ceil, sqrt
 import math
 import pygame
@@ -111,11 +112,14 @@ class Blob:
             self.target = self.newTarget(self.targetRange)
             self.makeMoveVector(self.target[0], self.target[1], self.speed)
 
+    @abstractclassmethod
+    def move():
+        pass
+
     def update(self, blobs, food, gamespeed):
         self.gamespeed = gamespeed
         self.size -= self.energyConsumption*self.gamespeed
         self.eatCooldown = max(-1, self.eatCooldown-1)
-        
 
         self.move()
 

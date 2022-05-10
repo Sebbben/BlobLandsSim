@@ -31,14 +31,6 @@ camMovingDown = False
 
 cam = Camera()
 
-cam.zoomTarget -= 0.6
-cam.zoomLvl -= 0.6
-
-cam.pos[0] =    -(WINDOW_RES[0] - (SIMULATION_SIZE[0]*cam.zoomLvl))//2
-cam.pos[1] =    -(WINDOW_RES[1] - (SIMULATION_SIZE[1]*cam.zoomLvl))//2
-cam.target[0] = -(WINDOW_RES[0] - (SIMULATION_SIZE[0]*cam.zoomLvl))//2
-cam.target[1] = -(WINDOW_RES[1] - (SIMULATION_SIZE[1]*cam.zoomLvl))//2
-
 pygame.init()
 
 
@@ -62,6 +54,16 @@ for _ in range(FOOD_AMOUNT//2):
 for _ in range(START_NUMBER_OF_BLOBS):
     blob = Herbivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], window, SIMULATION_SIZE)
     blobs.append(blob)
+
+def centerCamera():
+    cam.zoomTarget -= 0.6
+    cam.zoomLvl -= 0.6
+
+    cam.pos[0] =    -(WINDOW_RES[0] - (SIMULATION_SIZE[0]*cam.zoomLvl))//2
+    cam.pos[1] =    -(WINDOW_RES[1] - (SIMULATION_SIZE[1]*cam.zoomLvl))//2
+    cam.target[0] = -(WINDOW_RES[0] - (SIMULATION_SIZE[0]*cam.zoomLvl))//2
+    cam.target[1] = -(WINDOW_RES[1] - (SIMULATION_SIZE[1]*cam.zoomLvl))//2
+
 
 def checkIfEaten():
     global foods
@@ -246,6 +248,8 @@ def updateCam():
         cam.moveTarget(-mouseMovement[0], -mouseMovement[1])
         
     cam.moveTarget(camMoveX, camMoveY)
+
+centerCamera()
 
 while True:
     window.fill((255, 255, 255))
