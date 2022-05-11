@@ -39,7 +39,7 @@ class Blob:
                 "splittNumber": 2,
                 "type":"Herbivore",
                 "seeRange":3,
-                "seeChance":5
+                "seeChance":3
             }
 
 
