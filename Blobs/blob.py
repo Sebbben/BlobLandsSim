@@ -28,7 +28,9 @@ class Blob:
 
         self.dnaClamp = {
             "maxSize":[30, 100],
-            "splittNumber": [2,8]
+            "splittNumber": [2,8],
+            "seeRange": [0, 10],
+            "seeChance": [1, 50]
         }
 
         if dna:
@@ -39,7 +41,7 @@ class Blob:
                 "splittNumber": 2,
                 "type":"Herbivore",
                 "seeRange":3,
-                "seeChance":3
+                "seeChance":5
             }
 
 
@@ -67,14 +69,19 @@ class Blob:
                 self.dna[geneToMod] += random.randrange(-1,2)
             elif geneToMod == "type":
                 self.dna[geneToMod] = random.choice(["Herbivore", "Carnivore", "Parasite"])
+            elif geneToMod == "seeRange":
+                self.dna[geneToMod] = random.uniform(-0.5, 0.5)
+            elif geneToMod == "seeChance":
+                self.dna[geneToMod] = random.randint(-1, 1)
 
 
         self.clampMutations()
 
-    def draw(self, camera):
+    def draw(self, camera, drawLines):
         cameraX, cameraY = camera.pos
-        pygame.draw.circle(self.window, self.color, [int(self.pos[0]*camera.zoomLvl) - cameraX, int(self.pos[1]*camera.zoomLvl) - cameraY], round(self.size*camera.zoomLvl))
-        pygame.draw.line(self.window, (255, 0, 0), [int(self.pos[0]*camera.zoomLvl) - cameraX, int(self.pos[1]*camera.zoomLvl) - cameraY], [int(self.target[0]*camera.zoomLvl) - cameraX, int(self.target[1]*camera.zoomLvl) - cameraY], width=round(2*camera.zoomLvl))
+        if drawLines:
+            pygame.draw.line(self.window, (255, 0, 0), [int(self.pos[0]*camera.zoomLvl) - cameraX + self.window.get_size()[0], int(self.pos[1]*camera.zoomLvl) - cameraY + self.window.get_size()[1]], [int(self.target[0]*camera.zoomLvl) - cameraX + self.window.get_size()[0], int(self.target[1]*camera.zoomLvl) - cameraY + self.window.get_size()[1]], width=round(2*camera.zoomLvl))
+        pygame.draw.circle(self.window, self.color, [int(self.pos[0]*camera.zoomLvl) - cameraX + self.window.get_size()[0], int(self.pos[1]*camera.zoomLvl) - cameraY + self.window.get_size()[1]], round(self.size*camera.zoomLvl))
         
     def distTo(self, otherPos):
         return math.dist(otherPos,self.pos)

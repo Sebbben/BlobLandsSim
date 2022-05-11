@@ -19,7 +19,7 @@ class Food:
 
     def draw(self, camera):
         cameraX, cameraY = camera.pos
-        pygame.draw.circle(self.window, self.color, [(self.pos[0]*camera.zoomLvl)-cameraX, (self.pos[1]*camera.zoomLvl)-cameraY], self.size*camera.zoomLvl)
+        pygame.draw.circle(self.window, self.color, [int(self.pos[0]*camera.zoomLvl) - cameraX + self.window.get_size()[0], int(self.pos[1]*camera.zoomLvl) - cameraY + self.window.get_size()[1]], self.size*camera.zoomLvl)
     
     def notRotten(self):
         return self.age < self.maxAge

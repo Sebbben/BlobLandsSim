@@ -20,6 +20,7 @@ START_BLOB_SIZE = 20
 CAMERA_SPEED = 10
 SPEED = 1
 WINDOW_RES = (1080,720)
+SEE_TARGET_LINES = False
 
 lastBlobInfo = None
 paused = False
@@ -107,6 +108,7 @@ def getBlobInfo():
 def update():
     global blobs
     global foods
+    
 
     if len(foods) < FOOD_AMOUNT:
         foods.append(Food(window, SIMULATION_SIZE))
@@ -137,7 +139,7 @@ def draw():
         food.draw(cam)
     
     for blob in blobs:
-        blob.draw(cam)
+        blob.draw(cam, SEE_TARGET_LINES)
 
     if pygame.font and lastBlobInfo:
         f = pygame.font.Font(None, 32)
@@ -212,6 +214,7 @@ def handleKeyDown(event):
 
 def handleKeyUp(event):
     global SPEED
+    global SEE_TARGET_LINES
     if event.key == pygame.K_SPACE:
         global paused
         paused = not paused
@@ -230,6 +233,8 @@ def handleKeyUp(event):
         cam.zoom(0.1)
     elif event.key == pygame.K_LEFT:
         cam.zoom(-0.1)
+    elif event.key == pygame.K_t:
+        SEE_TARGET_LINES = not SEE_TARGET_LINES
 
 def updateCam():
     keys = pygame.key.get_pressed()
