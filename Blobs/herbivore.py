@@ -5,6 +5,7 @@ from math import sqrt
 class Herbivore(Blob):
     def __init__(self, size:float, pos:list, window, SIMULATION_SIZE:list, dna = {}):
         super().__init__(size, pos, window, SIMULATION_SIZE, dna)
+        self.isSeeFrame = False
 
     def split(self):
         from Blobs.parasite import Parasite
@@ -32,6 +33,13 @@ class Herbivore(Blob):
         self.pos[0] += self.xMove * self.gamespeed
         self.pos[1] += self.yMove * self.gamespeed
 
+    def getNewTarget(self):
+        super().getNewTarget()
+        if (random.randint(1, self.dna["seeChance"]) == 1):
+            self.isSeeFrame = True
+        else:
+            self.isSeeFrame = False     
+
     def eat(self, foods:list):
         newFoods = []
         for food in foods:
@@ -44,7 +52,8 @@ class Herbivore(Blob):
                 newFoods.append(food)
         foods.clear()
         foods.extend(newFoods)
-        self.see(foods)
+        if self.isSeeFrame: 
+            self.see(foods)
         self.makeMoveVector(self.target[0], self.target[1], self.speed * self.gamespeed)
 
 

@@ -38,7 +38,8 @@ class Blob:
                 "maxSize": 40,
                 "splittNumber": 2,
                 "type":"Herbivore",
-                "seeRange":3
+                "seeRange":3,
+                "seeChance":5
             }
 
 
@@ -111,8 +112,12 @@ class Blob:
 
     def updateTarget(self):
         if self.target == None or self.distTo(self.target) < self.speed * self.gamespeed:
-            self.target = self.newTarget(self.targetRange)
+            self.getNewTarget()
             self.makeMoveVector(self.target[0], self.target[1], self.speed * self.gamespeed)
+            
+    def getNewTarget(self):
+        self.target = self.newTarget(self.targetRange)
+        
 
     @abstractclassmethod
     def move():
