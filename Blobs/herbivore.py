@@ -1,3 +1,4 @@
+from email.errors import InvalidBase64CharactersDefect
 import random
 from Blobs.blob import Blob
 from math import sqrt
@@ -54,6 +55,7 @@ class Herbivore(Blob):
         foods.extend(newFoods)
         if self.isSeeFrame: 
             self.see(foods)
+            self.isSeeFrame = False
         self.makeMoveVector(self.target[0], self.target[1], self.speed * self.gamespeed)
 
 
