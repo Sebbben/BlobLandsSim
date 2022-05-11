@@ -44,5 +44,7 @@ class Herbivore(Blob):
                 newFoods.append(food)
         foods.clear()
         foods.extend(newFoods)
+        self.see(foods)
+        self.makeMoveVector(self.target[0], self.target[1], self.speed * self.gamespeed)
 
 

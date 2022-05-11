@@ -37,7 +37,8 @@ class Blob:
             self.dna = {
                 "maxSize": 40,
                 "splittNumber": 2,
-                "type":"Herbivore"
+                "type":"Herbivore",
+                "seeRange":3
             }
 
 
@@ -72,7 +73,7 @@ class Blob:
     def draw(self, camera):
         cameraX, cameraY = camera.pos
         pygame.draw.circle(self.window, self.color, [int(self.pos[0]*camera.zoomLvl) - cameraX, int(self.pos[1]*camera.zoomLvl) - cameraY], round(self.size*camera.zoomLvl))
-             
+        pygame.draw.line(self.window, (255, 0, 0), [int(self.pos[0]*camera.zoomLvl) - cameraX, int(self.pos[1]*camera.zoomLvl) - cameraY], [int(self.target[0]*camera.zoomLvl) - cameraX, int(self.target[1]*camera.zoomLvl) - cameraY], width=round(2*camera.zoomLvl))
         
     def distTo(self, otherPos):
         return math.dist(otherPos,self.pos)
@@ -105,12 +106,13 @@ class Blob:
 
     def newTarget(self, r):
         return [random.randint(0,self.SIMULATION_SIZE[0]-ceil(self.size)), random.randint(0, self.SIMULATION_SIZE[1]-ceil(self.size))]
+        return [0, 0]
         
 
     def updateTarget(self):
-        if self.target == None or self.distTo(self.target) < self.speed:
+        if self.target == None or self.distTo(self.target) < self.speed * self.gamespeed:
             self.target = self.newTarget(self.targetRange)
-            self.makeMoveVector(self.target[0], self.target[1], self.speed)
+            self.makeMoveVector(self.target[0], self.target[1], self.speed * self.gamespeed)
 
     @abstractclassmethod
     def move():
@@ -125,6 +127,16 @@ class Blob:
 
         self.checkIfTooSmall()
         self.checkIfTooLarge(blobs)
+        
+    def see(self, nearbyFoods):
+        min = self.distTo(nearbyFoods[0].pos)
+        for f in nearbyFoods:
+            dist = self.distTo(f.pos)
+            #if self.distTo(f.pos) < self.dna["seeRange"]:
+            if dist < min:      
+                self.target = f.pos
+                min = dist
+            
             
             
        

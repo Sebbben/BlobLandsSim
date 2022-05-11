@@ -239,7 +239,7 @@ def updateCam():
     camMovingUp = keys[pygame.K_w]
     camMovingDown = keys[pygame.K_s]
 
-
+    
     camMoveX = (camMovingRight-camMovingLeft) * CAMERA_SPEED
     camMoveY = (camMovingDown-camMovingUp) * CAMERA_SPEED
 
