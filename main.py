@@ -1,4 +1,3 @@
-from tkinter.tix import WINDOW
 import pygame
 import sys, random, math
 from Blobs.carnivore import Carnivore
@@ -113,13 +112,14 @@ def update():
     
 
     if len(foods) < FOOD_AMOUNT:
-        foods.append(Food(window, SIMULATION_SIZE))
+        if random.randint(1, round(FPS/10)) == 1:
+            foods.append(Food(window, SIMULATION_SIZE))
         
     for food in foods:
         food.update()
     
     for blob in blobs:
-        blob.update(blobs,food,SPEED)
+        blob.update(blobs,food,SPEED,FPS)
 
     if lastBlobInfo: 
         blobX = (blob.pos[0]*cam.zoomLvl)-cam.pos[0]

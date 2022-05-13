@@ -130,10 +130,11 @@ class Blob:
     def move():
         pass
 
-    def update(self, blobs, food, gamespeed):
+    def update(self, blobs, food, gamespeed, FPS):
         self.gamespeed = gamespeed
         self.size -= self.energyConsumption*self.gamespeed
         self.eatCooldown = max(-1, self.eatCooldown-1)
+        self.FPS = FPS
 
         self.move()
 
