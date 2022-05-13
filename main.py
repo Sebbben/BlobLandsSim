@@ -99,10 +99,7 @@ def getBlobInfo():
     mouseX, mouseY = pygame.mouse.get_pos()
 
     for blob in blobs:
-        blobX = (blob.pos[0]*cam.zoomLvl)-cam.pos[0]
-        blobY = (blob.pos[1]*cam.zoomLvl)-cam.pos[1]
-
-        if math.dist([blobX,blobY], [mouseX,mouseY]) < blob.size:
+        if math.dist(cam.getScreenPos(blob.pos), [mouseX,mouseY]) < blob.size:
             lastBlobInfo = blob
             cam.zoomTarget = 1
 
@@ -111,7 +108,7 @@ def update():
     global foods
     
 
-    if random.randint(1, round(FPS/10)) == 1:
+    if random.randint(1, round(FPS/20)) == 1:
         foods.append(Food(window, SIMULATION_SIZE))
         
     for food in foods:
