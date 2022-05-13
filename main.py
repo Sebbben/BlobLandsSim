@@ -30,7 +30,7 @@ camMovingLeft = False
 camMovingUp = False
 camMovingDown = False
 
-cam = Camera()
+
 
 pygame.init()
 
@@ -38,6 +38,8 @@ pygame.init()
 
 # window = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
 window = pygame.display.set_mode(WINDOW_RES, pygame.RESIZABLE)
+
+cam = Camera(window)
 
 fpsClock = pygame.time.Clock()
 
