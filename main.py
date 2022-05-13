@@ -118,11 +118,7 @@ def update():
         blob.update(blobs,food,SPEED,FPS)
 
     if lastBlobInfo: 
-        blobX = (blob.pos[0]*cam.zoomLvl)-cam.pos[0]
-        blobY = (blob.pos[1]*cam.zoomLvl)-cam.pos[1]
-        camX = lastBlobInfo.pos[0] - window.get_width()//2
-        camY = lastBlobInfo.pos[1] - window.get_height()//2
-        cam.setTarget([camX, camY])
+        cam.setTarget(cam.getScreenPos(lastBlobInfo.pos))
     
     blobs = [blob for blob in blobs if not blob.dead]
 
