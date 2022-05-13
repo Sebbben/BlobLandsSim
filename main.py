@@ -1,4 +1,3 @@
-from tkinter.tix import WINDOW
 import pygame
 import sys, random, math
 from Blobs.carnivore import Carnivore
