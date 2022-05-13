@@ -14,7 +14,7 @@ WIN_H = 1080
 SIMULATION_SIZE = [1500, 1500]
 FOOD_DENCITY = 1/3456
 FOOD_AMOUNT = int((SIMULATION_SIZE[0]*SIMULATION_SIZE[1])*FOOD_DENCITY)
-START_NUMBER_OF_BLOBS = 5
+START_NUMBER_OF_BLOBS = 20
 START_BLOB_SIZE = 20
 CAMERA_SPEED = 10
 SPEED = 1
@@ -111,9 +111,8 @@ def update():
     global foods
     
 
-    if len(foods) < FOOD_AMOUNT:
-        if random.randint(1, round(FPS/10)) == 1:
-            foods.append(Food(window, SIMULATION_SIZE))
+    if random.randint(1, round(FPS/10)) == 1:
+        foods.append(Food(window, SIMULATION_SIZE))
         
     for food in foods:
         food.update()
