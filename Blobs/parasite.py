@@ -1,4 +1,3 @@
-from __future__ import barry_as_FLUFL
 import math
 import random
 from Blobs.blob import Blob

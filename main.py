@@ -96,10 +96,10 @@ def getBlobInfo():
     global lastBlobInfo
 
     lastBlobInfo = None
-    mouseX, mouseY = pygame.mouse.get_pos()
+    mousePos = pygame.mouse.get_pos()
 
     for blob in blobs:
-        if math.dist(cam.getScreenPos(blob.pos), [mouseX,mouseY]) < blob.size:
+        if math.dist(cam.getScreenPos(blob.pos), cam.getScreenPos(mousePos)) < blob.size * cam.zoomLvl:
             lastBlobInfo = blob
             cam.zoomTarget = 1
 
