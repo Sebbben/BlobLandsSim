@@ -1,8 +1,11 @@
+from __future__ import barry_as_FLUFL
+import math
 import random
 from Blobs.blob import Blob
 from math import sqrt
 
 from Blobs.carnivore import Carnivore
+from Blobs.herbivore import Herbivore
 
 class Parasite(Blob):
     def __init__(self, size:float, pos:list, window, SIMULATION_SIZE:list, dna = {}):
@@ -13,6 +16,7 @@ class Parasite(Blob):
         self.leachAmount = 10
         self.energyConsumption = 1/1000
         self.speed = 1/2
+
 
     def split(self):
         from Blobs.carnivore import Carnivore
@@ -33,26 +37,30 @@ class Parasite(Blob):
             newBlobs.append(blob)
         return newBlobs
 
-    def update(self, blobs, food, gamespeed):
-        super().update(blobs, food, gamespeed)
+    def update(self, blobs, food, gamespeed, FPS):
+        super().update(blobs, food, gamespeed, FPS)
         self.updateHost(blobs)
 
     def updateHost(self,blobs):
-        if self.host and self.host.size > self.size: return # skip trying to get new host if it allready has one that is large enough
+        if self.host and (self.host.size > self.size) and isinstance(self.host, Carnivore): return # skip trying to get new host if it allready has one that is large enough
         self.host = None
         for blob in blobs:
-            if not isinstance(blob, Carnivore): continue
+            if not isinstance(blob, Carnivore) and not isinstance(blob, Herbivore): continue
             if blob.pos[0]<self.pos[0]-self.size*2 or blob.pos[0]>self.pos[0]+self.size*2: continue # skip if self is too far left or right of self 
-            if self.distTo(blob.pos) < self.size:
+            if self.distTo(blob.pos) < blob.size and self.eatCooldown < 0 and blob.size > self.size:
+                self.eatCooldown = blob.size*(self.FPS*0.5)
                 self.host = blob
                 print("found host", self.size, self.distTo(self.host.pos), [self.pos, self.host.pos])
-                break
+                if isinstance(blob, Carnivore):
+                    break
 
 
 
     def move(self):
-        if self.host:
+        if not (self.host == None):
             self.pos = self.host.pos
+            self.target = self.host.pos
+
         else:
             self.updateTarget()
 
@@ -60,7 +68,6 @@ class Parasite(Blob):
             self.pos[1] += self.yMove * self.gamespeed
 
     def eat(self):
-        if self.host:
-            print(self.host.size)
-            self.host.size = sqrt(self.host.size**2-self.leachAmount).real
-            self.size = sqrt(self.size**2+self.leachAmount).real
+        if self.host and isinstance(self.host, Carnivore):
+            self.host.size = sqrt(self.host.size**2-(self.leachAmount/math.pi)).real
+            self.size = sqrt(self.size**2+(self.leachAmount/math.pi)).real    

@@ -1,5 +1,5 @@
 class Camera:
-    def __init__(self):
+    def __init__(self, window):
         self.pos = [0,0]
         self.target = self.pos.copy()
         self.smoothness = 1/50
@@ -7,6 +7,7 @@ class Camera:
         self.zoomTarget = 1
         self.moveSnapDistance = 10
         self.zoomSnap = 0.05
+        self.window = window
         
     def setTarget(self, target):
         self.target = target 
@@ -29,3 +30,8 @@ class Camera:
 
     def zoom(self,z:float):
         self.zoomTarget += z
+        
+    
+    
+    def getScreenPos(self, worldPos):
+        return [int(worldPos[0] - self.pos[0]) *self.zoomLvl + self.window.get_width()/2, int(worldPos[1] - self.pos[1]) *self.zoomLvl + self.window.get_height()/2]

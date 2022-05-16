@@ -14,7 +14,7 @@ WIN_H = 1080
 SIMULATION_SIZE = [1500, 1500]
 FOOD_DENCITY = 1/3456
 FOOD_AMOUNT = int((SIMULATION_SIZE[0]*SIMULATION_SIZE[1])*FOOD_DENCITY)
-START_NUMBER_OF_BLOBS = 5
+START_NUMBER_OF_BLOBS = 20
 START_BLOB_SIZE = 20
 CAMERA_SPEED = 10
 SPEED = 1
@@ -29,7 +29,7 @@ camMovingLeft = False
 camMovingUp = False
 camMovingDown = False
 
-cam = Camera()
+
 
 pygame.init()
 
@@ -37,6 +37,8 @@ pygame.init()
 
 # window = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
 window = pygame.display.set_mode(WINDOW_RES, pygame.RESIZABLE)
+
+cam = Camera(window)
 
 fpsClock = pygame.time.Clock()
 
@@ -97,10 +99,7 @@ def getBlobInfo():
     mouseX, mouseY = pygame.mouse.get_pos()
 
     for blob in blobs:
-        blobX = (blob.pos[0]*cam.zoomLvl)-cam.pos[0]
-        blobY = (blob.pos[1]*cam.zoomLvl)-cam.pos[1]
-
-        if math.dist([blobX,blobY], [mouseX,mouseY]) < blob.size:
+        if math.dist(cam.getScreenPos(blob.pos), [mouseX,mouseY]) < blob.size:
             lastBlobInfo = blob
             cam.zoomTarget = 1
 
@@ -109,21 +108,17 @@ def update():
     global foods
     
 
-    if len(foods) < FOOD_AMOUNT:
+    if random.randint(1, round(FPS/20)) == 1:
         foods.append(Food(window, SIMULATION_SIZE))
         
     for food in foods:
         food.update()
     
     for blob in blobs:
-        blob.update(blobs,food,SPEED)
+        blob.update(blobs,food,SPEED,FPS)
 
     if lastBlobInfo: 
-        blobX = (blob.pos[0]*cam.zoomLvl)-cam.pos[0]
-        blobY = (blob.pos[1]*cam.zoomLvl)-cam.pos[1]
-        camX = lastBlobInfo.pos[0] - window.get_width()//2
-        camY = lastBlobInfo.pos[1] - window.get_height()//2
-        cam.setTarget([camX, camY])
+        cam.setTarget(cam.getScreenPos(lastBlobInfo.pos))
     
     blobs = [blob for blob in blobs if not blob.dead]
 
@@ -283,3 +278,7 @@ while True:
     pygame.display.flip()
 
     fpsClock.tick(FPS)
+
+
+
+

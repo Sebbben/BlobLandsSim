@@ -80,8 +80,8 @@ class Blob:
     def draw(self, camera, drawLines):
         cameraX, cameraY = camera.pos
         if drawLines:
-            pygame.draw.line(self.window, (255, 0, 0), [int(self.pos[0]*camera.zoomLvl) - cameraX + self.window.get_size()[0], int(self.pos[1]*camera.zoomLvl) - cameraY + self.window.get_size()[1]], [int(self.target[0]*camera.zoomLvl) - cameraX + self.window.get_size()[0], int(self.target[1]*camera.zoomLvl) - cameraY + self.window.get_size()[1]], width=round(2*camera.zoomLvl))
-        pygame.draw.circle(self.window, self.color, [int(self.pos[0]*camera.zoomLvl) - cameraX + self.window.get_size()[0], int(self.pos[1]*camera.zoomLvl) - cameraY + self.window.get_size()[1]], round(self.size*camera.zoomLvl))
+            pygame.draw.line(self.window, (255, 0, 0), camera.getScreenPos(self.pos), camera.getScreenPos(self.target), width=round(2*camera.zoomLvl))
+        pygame.draw.circle(self.window, self.color, camera.getScreenPos(self.pos), round(self.size*camera.zoomLvl))
         
     def distTo(self, otherPos):
         return math.dist(otherPos,self.pos)
@@ -130,10 +130,11 @@ class Blob:
     def move():
         pass
 
-    def update(self, blobs, food, gamespeed):
+    def update(self, blobs, food, gamespeed, FPS):
         self.gamespeed = gamespeed
         self.size -= self.energyConsumption*self.gamespeed
         self.eatCooldown = max(-1, self.eatCooldown-1)
+        self.FPS = FPS
 
         self.move()
 
