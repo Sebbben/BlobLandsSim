@@ -1,5 +1,5 @@
 from abc import abstractclassmethod
-from math import ceil, sqrt
+from math import ceil
 import math
 import pygame
 import random

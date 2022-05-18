@@ -1,10 +1,10 @@
-import pygame
-import sys, random, math
+import pygame, sys, random, math, cProfile, pstats
+
 from Blobs.carnivore import Carnivore
 from Blobs.herbivore import Herbivore
 from Blobs.parasite import Parasite
+
 from food import Food
-import cProfile, pstats
 from camera import Camera
 
 FPS = 120 # frames per second setting
@@ -37,6 +37,8 @@ pygame.init()
 
 # window = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
 window = pygame.display.set_mode(WINDOW_RES, pygame.RESIZABLE)
+
+pygame.display.set_caption("BlobLandSim")
 
 cam = Camera(window, SIMULATION_SIZE)
 cam.center()
@@ -98,7 +100,8 @@ def update():
     global foods
     
 
-    if random.randint(1, round(FPS/20)) == 1:
+    # if random.randint(1, round(FPS/20)) == 1:
+    if random.randint(1, 2) == 1:
         foods.append(Food(window, SIMULATION_SIZE))
         
     for food in foods:
@@ -199,6 +202,7 @@ def handleKeyDown(event):
 def handleKeyUp(event):
     global SPEED
     global SEE_TARGET_LINES
+    global blobs
     if event.key == pygame.K_SPACE:
         global paused
         paused = not paused
