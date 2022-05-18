@@ -16,7 +16,6 @@ class Blob:
         self.eatEfficiency = 1
         self.dead = False
         self.MIN_BLOB_SIZE = 5
-        self.targetRange = 100
         self.speed = 4
         self.color = (100,70,19)
         self.target = None
@@ -70,17 +69,17 @@ class Blob:
             elif geneToMod == "type":
                 self.dna[geneToMod] = random.choice(["Herbivore", "Carnivore", "Parasite"])
             elif geneToMod == "seeRange":
-                self.dna[geneToMod] = random.uniform(-0.5, 0.5)
+                self.dna[geneToMod] += random.uniform(-0.5, 0.5)
             elif geneToMod == "seeChance":
-                self.dna[geneToMod] = random.randint(-1, 1)
+                self.dna[geneToMod] += random.randint(-1, 1)
 
 
         self.clampMutations()
 
     def draw(self, camera, drawLines):
-        cameraX, cameraY = camera.pos
         if drawLines:
-            pygame.draw.line(self.window, (255, 0, 0), camera.getScreenPos(self.pos), camera.getScreenPos(self.target), width=round(2*camera.zoomLvl))
+            pygame.draw.line(self.window, self.color, camera.getScreenPos(self.pos), camera.getScreenPos(self.target), width=round(2*camera.zoomLvl))
+
         pygame.draw.circle(self.window, self.color, camera.getScreenPos(self.pos), round(self.size*camera.zoomLvl))
         
     def distTo(self, otherPos):
@@ -112,18 +111,17 @@ class Blob:
             self.dead = True
             blobs += self.split()
 
-    def newTarget(self, r):
+    def newTarget(self):
         return [random.randint(0,self.SIMULATION_SIZE[0]-ceil(self.size)), random.randint(0, self.SIMULATION_SIZE[1]-ceil(self.size))]
-        return [0, 0]
         
 
     def updateTarget(self):
-        if self.target == None or self.distTo(self.target) < self.speed * self.gamespeed:
+        if self.target == None or self.distTo(self.target) < self.size - self.speed * self.gamespeed:
             self.getNewTarget()
             self.makeMoveVector(self.target[0], self.target[1], self.speed * self.gamespeed)
             
     def getNewTarget(self):
-        self.target = self.newTarget(self.targetRange)
+        self.target = self.newTarget()
         
 
     @abstractclassmethod
