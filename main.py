@@ -12,7 +12,7 @@ WIN_W = 1920
 WIN_H = 1080
 
 SIMULATION_SIZE = [1500, 1500]
-FOOD_DENCITY = 1/3456
+FOOD_DENCITY = 1/7000
 FOOD_AMOUNT = int((SIMULATION_SIZE[0]*SIMULATION_SIZE[1])*FOOD_DENCITY)
 START_NUMBER_OF_BLOBS = 20
 START_BLOB_SIZE = 20
@@ -57,6 +57,9 @@ for _ in range(START_NUMBER_OF_BLOBS):
     blob = Herbivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], window, SIMULATION_SIZE)
     blobs.append(blob)
 
+for x in range(3): blobs.append(Carnivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], window, SIMULATION_SIZE))
+    
+
 
 
 def checkIfEaten():
@@ -88,10 +91,10 @@ def getBlobInfo():
     global lastBlobInfo
 
     lastBlobInfo = None
-    mouseX, mouseY = pygame.mouse.get_pos()
+    mousePos = pygame.mouse.get_pos()
 
     for blob in blobs:
-        if math.dist(cam.getScreenPos(blob.pos), [mouseX,mouseY]) < blob.size:
+        if math.dist(cam.getScreenPos(blob.pos), cam.getScreenPos(mousePos)) < blob.size * cam.zoomLvl:
             lastBlobInfo = blob
             cam.zoomTarget = 1
 
