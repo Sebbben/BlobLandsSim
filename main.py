@@ -211,8 +211,7 @@ def handleKeyUp(event):
         global paused
         paused = not paused
     elif event.key == pygame.K_ESCAPE:
-        pygame.quit()
-        sys.exit()
+        quitGame()
     elif event.key == pygame.K_BACKSPACE:
         p()
     elif event.key == pygame.K_f:
@@ -248,13 +247,20 @@ def updateCam():
         
     cam.moveTarget(camMoveX, camMoveY)
 
+def quitGame():
+    pygame.quit()
+    sys.exit()
+
+
 while True:
     window.fill((255, 255, 255))
 
+    if len(blobs) == 0:
+        quitGame()
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
+            quitGame()
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             handleMouseDown(event)
