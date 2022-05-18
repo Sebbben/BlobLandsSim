@@ -75,7 +75,7 @@ class Parasite(Blob):
             if self.host.size**2-(self.leachAmount/math.pi) < 0:
                 self.host = None
                 self.getNewTarget()
-
-            self.host.size = sqrt(self.host.size**2-(self.leachAmount/math.pi)).real
-            # self.size = sqrt(self.size**2+(self.leachAmount/math.pi)).real
-            self.size += 1
+            else:
+                self.host.size = sqrt(self.host.size**2-(self.leachAmount/math.pi)).real
+                # self.size = sqrt(self.size**2+(self.leachAmount/math.pi)).real
+                self.size += 1
