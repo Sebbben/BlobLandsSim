@@ -26,7 +26,7 @@ class Blob:
         self.SIMULATION_SIZE = SIMULATION_SIZE
 
         self.dnaClamp = {
-            "maxSize":[30, 100],
+            "maxSize":[30, 160],
             "minSize": [15,50],
             "seeRange": [0, 10],
             "seeChance": [1, 50]
@@ -36,7 +36,7 @@ class Blob:
             self.dna = dna
         else:
             self.dna = {
-                "maxSize": 40,
+                "maxSize": 80,
                 "minSize": 20,
                 "type":"Herbivore",
                 "seeRange":3,

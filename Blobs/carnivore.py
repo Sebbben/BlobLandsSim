@@ -51,8 +51,8 @@ class Carnivore(Blob):
         for b in blobs: 
             if b.dna["type"] == "Carnivore": continue # dont be a canibal
             if b.pos[0]<self.pos[0]-self.size*2 or b.pos[0]>self.pos[0]+self.size*2: continue # skip if self is too far left or right of self 
-            if self.distTo(b.pos) < self.size and self.size + self.size*2 > b.size > self.size*(0/4):
-                if isinstance(b, Herbivore) and self.eatCooldown < 0:
+            if self.distTo(b.pos) < self.size and self.size + self.size*2 > b.size:# > self.size*(0/4):
+                if isinstance(b, Herbivore) or isinstance(b, Carnivore) and self.eatCooldown < 0 and not b is self:
                     self.eatCooldown = b.size*(FPS*0.5)
                     self.size = sqrt(self.size**2 + b.size**2).real
 
