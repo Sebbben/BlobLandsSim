@@ -94,7 +94,7 @@ def getBlobInfo():
     mousePos = pygame.mouse.get_pos()
 
     for blob in blobs:
-        if math.dist(cam.getScreenPos(blob.pos), cam.getScreenPos(mousePos)) < blob.size * cam.zoomLvl:
+        if math.dist(cam.getScreenPos(blob.pos), mousePos) < blob.size * cam.zoomLvl:
             lastBlobInfo = blob
             cam.zoomTarget = 1
 
@@ -114,7 +114,8 @@ def update():
         blob.update(blobs,food,SPEED,FPS)
 
     if lastBlobInfo: 
-        cam.setTarget(cam.getScreenPos(lastBlobInfo.pos))
+        [posX,posY] = cam.getScreenPos(lastBlobInfo.pos)
+        cam.nonSmoothMove([posX-window.get_width()//2, posY-window.get_height()//2])
     
     blobs = [blob for blob in blobs if not blob.dead]
 
@@ -220,9 +221,9 @@ def handleKeyUp(event):
         SPEED += 0.1
     elif event.key == pygame.K_DOWN:
         SPEED -= 0.1
-    elif event.key == pygame.K_RIGHT:
+    elif event.key == pygame.K_LSHIFT:
         cam.zoom(0.1)
-    elif event.key == pygame.K_LEFT:
+    elif event.key == pygame.K_LCTRL:
         cam.zoom(-0.1)
     elif event.key == pygame.K_t:
         SEE_TARGET_LINES = not SEE_TARGET_LINES
@@ -243,7 +244,7 @@ def updateCam():
 
     mouseMovement = pygame.mouse.get_rel() # needs to get called every frame to get accurate readings
     if pygame.mouse.get_pressed()[0]:
-        cam.moveTarget(-mouseMovement[0], -mouseMovement[1])
+        cam.nonSmoothMove([-mouseMovement[0], -mouseMovement[1]])
         
     cam.moveTarget(camMoveX, camMoveY)
 

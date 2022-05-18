@@ -8,9 +8,15 @@ class Parasite(Blob):
     def __init__(self, size:float, pos:list, window, SIMULATION_SIZE:list, dna = {}):
         super().__init__(size, pos, window, SIMULATION_SIZE, dna)
 
+
+        self.dnaClamp["maxSize"] = [5,30]
+
+        if not dna:
+            self.dna["maxSize"] = 20
+
         self.color = (255,255,0)
         self.host = None
-        self.leachAmount = 10
+        self.leachAmount = 5
         self.energyConsumption = 1/1000
         self.speed = 1/2
 
@@ -39,11 +45,11 @@ class Parasite(Blob):
         self.updateHost(blobs)
 
     def updateHost(self,blobs):
-        # print(self.host)
         if self.host: # skip trying to get new host if it allready has one
             if self.host.size > self.size: # condition when parasite should leave host
                 self.host = None
                 self.getNewTarget()
+                self.makeMoveVector(self.target[0], self.target[1], self.speed * self.gamespeed)
             else:
                 return
 
@@ -53,7 +59,6 @@ class Parasite(Blob):
             if self.distTo(blob.pos) < blob.size and self.eatCooldown < 0 and blob.size > self.size:
                 self.host = blob
                 break
-                # print("found host", self.size, self.distTo(self.host.pos), [self.pos, self.host.pos])
                 
 
 
@@ -70,12 +75,12 @@ class Parasite(Blob):
 
     def eat(self):
         if self.host: # and isinstance(self.host, Carnivore):
-            # print("eat")
 
             if self.host.size**2-(self.leachAmount/math.pi) < 0:
                 self.host = None
                 self.getNewTarget()
+                self.makeMoveVector(self.target[0], self.target[1], self.speed * self.gamespeed)
+                return
 
             self.host.size = sqrt(self.host.size**2-(self.leachAmount/math.pi)).real
-            # self.size = sqrt(self.size**2+(self.leachAmount/math.pi)).real
-            self.size += 1
+            self.size = sqrt(self.size**2+(self.leachAmount/math.pi)).real

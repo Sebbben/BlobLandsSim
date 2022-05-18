@@ -1,6 +1,5 @@
 import random
 from math import sqrt
-import this
 from Blobs.blob import Blob
 from Blobs.herbivore import Herbivore
 
@@ -54,11 +53,6 @@ class Carnivore(Blob):
             if self.distTo(b.pos) < self.size and self.size + self.size*2 > b.size > self.size*(0/4):
                 if isinstance(b, Herbivore) and self.eatCooldown < 0:
                     self.eatCooldown = b.size*(FPS*0.5)
-                    print(self.eatCooldown)
-                    #exit()
-                    #self.eatCooldown = 0
-                    #self.size = sqrt(self.size**2 + (b.size*self.eatEfficiency)**2)
-                    print(sqrt(self.size**2 + b.size**2).real - self.size)
                     self.size = sqrt(self.size**2 + b.size**2).real
 
                     b.dead = True
