@@ -67,8 +67,8 @@ def checkIfEaten():
     global blobs
 
     
-    foods.sort(key=lambda f: f.pos[0])
-    blobs.sort(key=lambda b: b.pos[0])
+    # foods.sort(key=lambda f: f.pos[0])
+    # blobs.sort(key=lambda b: b.pos[0])
 
 
     for blob in blobs:
@@ -146,19 +146,19 @@ def showStats():
     global blobs
     avrgVegiDna = {
         "maxSize": [],
-        "splittNumber": [],
+        "minSize": [],
     }
     avrgMeatEaterDna = {
         "maxSize": [],
-        "splittNumber": [],
+        "minSize": [],
     }
     for blob in blobs:
-        if blob.dna["type"] == "Carnivore":
+        if isinstance(blob, Carnivore):
             avrgMeatEaterDna["maxSize"].append(blob.dna["maxSize"])
-            avrgMeatEaterDna["splittNumber"].append(blob.dna["splittNumber"])
+            avrgMeatEaterDna["minSize"].append(blob.dna["minSize"])
         else:
             avrgVegiDna["maxSize"].append(blob.dna["maxSize"])
-            avrgVegiDna["splittNumber"].append(blob.dna["splittNumber"])
+            avrgVegiDna["minSize"].append(blob.dna["minSize"])
 
     if len(avrgVegiDna["maxSize"]):
         for key in avrgVegiDna:

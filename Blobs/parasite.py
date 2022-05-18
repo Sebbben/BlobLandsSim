@@ -20,16 +20,20 @@ class Parasite(Blob):
         self.energyConsumption = 1/1000
         self.speed = 1/2
 
+        self.hostlessTimerResetTime = 1200
+        self.hostlessTimer = self.hostlessTimerResetTime
+
 
     def split(self):
         from Blobs.carnivore import Carnivore
         from Blobs.herbivore import Herbivore
         newBlobs = []
         self.mutate()
-        for _ in range(self.dna["splittNumber"]):
-            newSize = self.size//self.dna["splittNumber"]
-            newX = self.pos[0]+random.randint(0,self.size//self.dna["splittNumber"])
-            newY = self.pos[1]+random.randint(0,self.size//self.dna["splittNumber"])
+        splittNumber = int(self.size // self.dna["minSize"])
+        for _ in range(splittNumber):
+            newSize = self.size//splittNumber
+            newX = self.pos[0]+random.randint(0,self.size//splittNumber)
+            newY = self.pos[1]+random.randint(0,self.size//splittNumber)
 
             if self.dna["type"] == "Herbivore":
                 blob = Herbivore(newSize, [newX,newY], self.window, self.SIMULATION_SIZE, self.dna.copy())
@@ -43,14 +47,27 @@ class Parasite(Blob):
     def update(self, blobs, food, gamespeed, FPS):
         super().update(blobs, food, gamespeed, FPS)
         self.updateHost(blobs)
+        self.updateHostTimer()
+
+    def updateHostTimer(self):
+        self.hostlessTimer -= 1
+        if self.hostlessTimer < 0:
+            self.dead = True
+            return
+
+        if self.host:
+            self.hostlessTimer = self.hostlessTimerResetTime
+
+
 
     def updateHost(self,blobs):
+
         if self.host: # skip trying to get new host if it allready has one
             if self.host.size > self.size: # condition when parasite should leave host
                 self.host = None
                 self.getNewTarget()
                 self.makeMoveVector(self.target[0], self.target[1], self.speed * self.gamespeed)
-            else:
+            else: # if has host and everythin is a ok
                 return
 
         for blob in blobs:

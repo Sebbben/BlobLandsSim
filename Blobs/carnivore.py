@@ -17,10 +17,11 @@ class Carnivore(Blob):
     def split(self):
         newBlobs = []
         self.mutate()
-        for _ in range(self.dna["splittNumber"]):
-            newSize = self.size//self.dna["splittNumber"]
-            newX = self.pos[0]+random.randint(0,self.size//self.dna["splittNumber"])
-            newY = self.pos[1]+random.randint(0,self.size//self.dna["splittNumber"])
+        splittNumber = int(self.size // self.dna["minSize"])
+        for _ in range(splittNumber):
+            newSize = self.size//splittNumber
+            newX = self.pos[0]+random.randint(0,self.size//splittNumber)
+            newY = self.pos[1]+random.randint(0,self.size//splittNumber)
 
             from Blobs.herbivore import Herbivore
             from Blobs.parasite import Parasite

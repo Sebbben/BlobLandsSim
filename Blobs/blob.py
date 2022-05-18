@@ -27,7 +27,7 @@ class Blob:
 
         self.dnaClamp = {
             "maxSize":[30, 100],
-            "splittNumber": [2,8],
+            "minSize": [15,50],
             "seeRange": [0, 10],
             "seeChance": [1, 50]
         }
@@ -37,7 +37,7 @@ class Blob:
         else:
             self.dna = {
                 "maxSize": 40,
-                "splittNumber": 2,
+                "minSize": 20,
                 "type":"Herbivore",
                 "seeRange":3,
                 "seeChance":5
@@ -64,8 +64,8 @@ class Blob:
             geneToMod = dnaKeys[random.randint(0,len(dnaKeys)-1)]
             if geneToMod == "maxSize":
                 self.dna[geneToMod] += random.randint(-int(self.dna[geneToMod]*self.MAX_MUTATION),int(self.dna[geneToMod]*self.MAX_MUTATION))
-            elif geneToMod == "splittNumber":
-                self.dna[geneToMod] += random.randrange(-1,2)
+            elif geneToMod == "minSize":
+                self.dna[geneToMod] = min(int(self.dna["maxSize"]//2), self.dna[geneToMod] + random.randint(-int(self.dna[geneToMod]*self.MAX_MUTATION),int(self.dna[geneToMod]*self.MAX_MUTATION)))
             elif geneToMod == "type":
                 self.dna[geneToMod] = random.choice(["Herbivore", "Carnivore", "Parasite"])
             elif geneToMod == "seeRange":
