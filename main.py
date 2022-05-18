@@ -38,16 +38,14 @@ pygame.init()
 # window = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
 window = pygame.display.set_mode(WINDOW_RES, pygame.RESIZABLE)
 
-cam = Camera(window)
+cam = Camera(window, SIMULATION_SIZE)
+cam.center()
 
 fpsClock = pygame.time.Clock()
 
 
 blobs = []
 foods = []
-
-cameraPos = [window.get_width()/2, window.get_height()/2]
-
 
 for _ in range(FOOD_AMOUNT//2):
     foods.append(Food(window,SIMULATION_SIZE, age=random.randint(0,FPS*20)))
@@ -57,14 +55,6 @@ for _ in range(START_NUMBER_OF_BLOBS):
     blob = Herbivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], window, SIMULATION_SIZE)
     blobs.append(blob)
 
-def centerCamera():
-    cam.zoomTarget -= 0.6
-    cam.zoomLvl -= 0.6
-
-    cam.pos[0] =    -(WINDOW_RES[0] - (SIMULATION_SIZE[0]*cam.zoomLvl))//2
-    cam.pos[1] =    -(WINDOW_RES[1] - (SIMULATION_SIZE[1]*cam.zoomLvl))//2
-    cam.target[0] = -(WINDOW_RES[0] - (SIMULATION_SIZE[0]*cam.zoomLvl))//2
-    cam.target[1] = -(WINDOW_RES[1] - (SIMULATION_SIZE[1]*cam.zoomLvl))//2
 
 
 def checkIfEaten():
@@ -229,6 +219,8 @@ def handleKeyUp(event):
         cam.zoom(-0.1)
     elif event.key == pygame.K_t:
         SEE_TARGET_LINES = not SEE_TARGET_LINES
+    elif event.key == pygame.K_RETURN:
+        cam.center()
 
 def updateCam():
     keys = pygame.key.get_pressed()
@@ -247,8 +239,6 @@ def updateCam():
         cam.moveTarget(-mouseMovement[0], -mouseMovement[1])
         
     cam.moveTarget(camMoveX, camMoveY)
-
-centerCamera()
 
 while True:
     window.fill((255, 255, 255))
