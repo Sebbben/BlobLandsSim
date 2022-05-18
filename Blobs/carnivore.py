@@ -1,5 +1,6 @@
 import random
 from math import sqrt
+import this
 from Blobs.blob import Blob
 from Blobs.herbivore import Herbivore
 
@@ -10,8 +11,9 @@ class Carnivore(Blob):
 
         self.energyConsumption = 1/450
         self.color = (200,50,50)
-        self.eatCooldown = self.size * 50
-        self.eatEfficiency = 1/2
+        self.eatCooldown = self.size * 3
+        self.eatEfficiency = 1
+        self.isSeeFrame = False
 
     def split(self):
         newBlobs = []
@@ -40,16 +42,25 @@ class Carnivore(Blob):
 
         self.pos[0] += self.xMove * self.gamespeed
         self.pos[1] += self.yMove * self.gamespeed
+    
+    def getNewTarget(self):
+        super().getNewTarget()
+        self.isSeeFrame = (random.randint(1, self.dna["seeChance"]) == 1) 
 
     def eat(self, blobs, FPS):
-        for b in blobs:
+        for b in blobs: 
             if b.dna["type"] == "Carnivore": continue # dont be a canibal
             if b.pos[0]<self.pos[0]-self.size*2 or b.pos[0]>self.pos[0]+self.size*2: continue # skip if self is too far left or right of self 
-            if self.distTo(b.pos) < self.size and self.size > b.size > self.size*(0/4):
-                if b is Herbivore and self.eatCooldown < 0:
+            if self.distTo(b.pos) < self.size and self.size + self.size*2 > b.size > self.size*(0/4):
+                if isinstance(b, Herbivore) and self.eatCooldown < 0:
                     self.eatCooldown = b.size*(FPS*0.5)
-                    # self.eatCooldown = 0
-                    self.size = sqrt(self.size**2 + (b.size*self.eatEfficiency)**2).real
-                b.dead = True
+                    print(self.eatCooldown)
+                    #exit()
+                    #self.eatCooldown = 0
+                    #self.size = sqrt(self.size**2 + (b.size*self.eatEfficiency)**2)
+                    print(sqrt(self.size**2 + b.size**2).real - self.size)
+                    self.size = sqrt(self.size**2 + b.size**2).real
+
+                    b.dead = True
 
         

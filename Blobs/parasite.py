@@ -41,7 +41,6 @@ class Parasite(Blob):
 
     def updateHost(self,blobs):
         if self.host and (self.host.size > self.size): 
-            print(self.host)
             return # skip trying to get new host if it allready has one that is large enough
         self.host = None
         for blob in blobs:
@@ -50,7 +49,6 @@ class Parasite(Blob):
             if self.distTo(blob.pos) < blob.size and self.eatCooldown < 0 and blob.size > self.size:
                 self.eatCooldown = blob.size*(self.FPS*0.5)
                 self.host = blob
-                print("found host", self.size, self.distTo(self.host.pos), [self.pos, self.host.pos])
                 if isinstance(blob, Carnivore):
                     break
 
@@ -68,7 +66,6 @@ class Parasite(Blob):
 
     def eat(self):
         if self.host: # and isinstance(self.host, Carnivore):
-            print("eat")
             self.host.size = sqrt(self.host.size**2-(self.leachAmount/math.pi)).real
             # self.size = sqrt(self.size**2+(self.leachAmount/math.pi)).real
             self.size += 1
