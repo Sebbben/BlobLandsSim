@@ -1,6 +1,5 @@
 import random
 from math import sqrt
-import this
 from Blobs.blob import Blob
 from Blobs.herbivore import Herbivore
 
@@ -18,10 +17,11 @@ class Carnivore(Blob):
     def split(self):
         newBlobs = []
         self.mutate()
-        for _ in range(self.dna["splittNumber"]):
-            newSize = self.size//self.dna["splittNumber"]
-            newX = self.pos[0]+random.randint(0,self.size//self.dna["splittNumber"])
-            newY = self.pos[1]+random.randint(0,self.size//self.dna["splittNumber"])
+        splittNumber = int(self.size // self.dna["minSize"])
+        for _ in range(splittNumber):
+            newSize = self.size//splittNumber
+            newX = self.pos[0]+random.randint(0,self.size//splittNumber)
+            newY = self.pos[1]+random.randint(0,self.size//splittNumber)
 
             from Blobs.herbivore import Herbivore
             from Blobs.parasite import Parasite
@@ -54,9 +54,6 @@ class Carnivore(Blob):
             if self.distTo(b.pos) < self.size and self.size + self.size*2 > b.size > self.size*(0/4):
                 if isinstance(b, Herbivore) and self.eatCooldown < 0:
                     self.eatCooldown = b.size*(FPS*0.5)
-                    #self.eatCooldown = 0
-                    #self.size = sqrt(self.size**2 + (b.size*self.eatEfficiency)**2)
-                    print(sqrt(self.size**2 + b.size**2).real - self.size)
                     self.size = sqrt(self.size**2 + b.size**2).real
 
                     b.dead = True
