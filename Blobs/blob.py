@@ -5,7 +5,6 @@ import pygame
 import random
 
 
-
 class Blob:
     def __init__(self, size:float, pos:list, window, SIMULATION_SIZE:list, dna = {}) -> None:
         self.pos = pos
@@ -46,6 +45,21 @@ class Blob:
 
         
         self.window = window
+
+
+    def split(self):
+        newBlobs = []
+        self.mutate()
+        splittNumber = int(self.size // self.dna["minSize"])
+        for _ in range(splittNumber):
+            newSize = self.size//splittNumber
+            newX = self.pos[0]+random.randint(0,self.size//splittNumber)
+            newY = self.pos[1]+random.randint(0,self.size//splittNumber)
+
+            blob = BlobFactory().createBlob(newSize, [newX,newY], self.window, self.SIMULATION_SIZE, self.dna)
+
+            newBlobs.append(blob)
+        return newBlobs
 
     def clampMutations(self):
         for key in self.dna:
@@ -207,3 +221,5 @@ class Blob:
 
         inRange = [x for x in xFind if x in yFind]
         return inRange
+
+from Blobs.blobFactory import BlobFactory # DO NOT MOVE, NEEDS TO MAKE IMPORT AS LAST THING THAT HAPPENES IN FILE

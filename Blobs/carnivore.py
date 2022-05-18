@@ -1,11 +1,10 @@
 import random
 from math import sqrt
 from Blobs.blob import Blob
-from Blobs.herbivore import Herbivore
-
 
 class Carnivore(Blob):
     def __init__(self, size:float, pos:list, window, SIMULATION_SIZE:list, dna = {}):
+        from Blobs.herbivore import Herbivore
         super().__init__(size, pos, window, SIMULATION_SIZE, dna)
 
         self.energyConsumption = 1/450
@@ -13,28 +12,6 @@ class Carnivore(Blob):
         self.eatCooldown = self.size * 3
         self.eatEfficiency = 1
         self.isSeeFrame = False
-
-    def split(self):
-        newBlobs = []
-        self.mutate()
-        splittNumber = int(self.size // self.dna["minSize"])
-        for _ in range(splittNumber):
-            newSize = self.size//splittNumber
-            newX = self.pos[0]+random.randint(0,self.size//splittNumber)
-            newY = self.pos[1]+random.randint(0,self.size//splittNumber)
-
-            from Blobs.herbivore import Herbivore
-            from Blobs.parasite import Parasite
-
-            if self.dna["type"] == "Herbivore":
-                blob = Herbivore(newSize, [newX,newY], self.window, self.SIMULATION_SIZE, self.dna.copy())
-            elif self.dna["type"] == "Carnivore":
-                blob = Carnivore(newSize, [newX,newY], self.window, self.SIMULATION_SIZE, self.dna.copy())
-            elif self.dna["type"] == "Parasite":
-                blob = Parasite(newSize, [newX,newY], self.window, self.SIMULATION_SIZE, self.dna.copy())
-
-            newBlobs.append(blob)
-        return newBlobs
 
 
     def move(self):
@@ -52,7 +29,7 @@ class Carnivore(Blob):
             if b.dna["type"] == "Carnivore": continue # dont be a canibal
             if b.pos[0]<self.pos[0]-self.size*2 or b.pos[0]>self.pos[0]+self.size*2: continue # skip if self is too far left or right of self 
             if self.distTo(b.pos) < self.size and self.size + self.size*2 > b.size:# > self.size*(0/4):
-                if isinstance(b, Herbivore) or isinstance(b, Carnivore) and self.eatCooldown < 0 and not b is self:
+                if b.dna["type"] == "Herbivore" or b.dna["type"] == "Carnivore" and self.eatCooldown < 0 and not b is self:
                     self.eatCooldown = b.size*(FPS*0.5)
                     self.size = sqrt(self.size**2 + b.size**2).real
 

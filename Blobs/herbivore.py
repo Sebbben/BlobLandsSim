@@ -7,27 +7,6 @@ class Herbivore(Blob):
         super().__init__(size, pos, window, SIMULATION_SIZE, dna)
         self.isSeeFrame = False
 
-    def split(self):
-        from Blobs.parasite import Parasite
-        from Blobs.carnivore import Carnivore
-        newBlobs = []
-        self.mutate()
-        splittNumber = int(self.size // self.dna["minSize"])
-        for _ in range(splittNumber):
-            newSize = self.size//splittNumber
-            newX = self.pos[0]+random.randint(0,self.size//splittNumber)
-            newY = self.pos[1]+random.randint(0,self.size//splittNumber)
-
-            if self.dna["type"] == "Herbivore":
-                blob = Herbivore(newSize, [newX,newY], self.window, self.SIMULATION_SIZE, self.dna.copy())
-            elif self.dna["type"] == "Carnivore":
-                blob = Carnivore(newSize, [newX,newY], self.window, self.SIMULATION_SIZE, self.dna.copy())
-            elif self.dna["type"] == "Parasite":
-                blob = Parasite(newSize, [newX,newY], self.window, self.SIMULATION_SIZE, self.dna.copy())
-
-            newBlobs.append(blob)
-        return newBlobs
-
     def move(self):
         self.updateTarget()
 
