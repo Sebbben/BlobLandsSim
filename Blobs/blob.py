@@ -120,10 +120,20 @@ class Blob:
         if self.size < self.MIN_BLOB_SIZE:
             self.dead = True
 
-    def checkIfTooLarge(self,blobs):
+    def checkIfTooLarge(self,blobs:list):
         if self.readyToSplitt():
             self.dead = True
-            blobs += self.split()
+            babies = self.split()
+            for b in babies:
+                for bIndex, blob in enumerate(blobs):
+                    if blob.pos[0]>b.pos[0]:
+                        blobs.insert(bIndex)
+                        break
+
+        print([int(b.pos[0]) for b in blobs])
+        print(all([blobs[i].pos[0] < blobs[i+1].pos[0] for i in range(len(blobs)-1)]), len(blobs))
+
+
 
     def newTarget(self):
         return [random.randint(0,self.SIMULATION_SIZE[0]-ceil(self.size)), random.randint(0, self.SIMULATION_SIZE[1]-ceil(self.size))]
@@ -163,6 +173,7 @@ class Blob:
                 min = dist
             
             
+
     def getClose(self, lists):
 
         [xSorted,ySorted] = lists

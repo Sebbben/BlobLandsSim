@@ -60,6 +60,8 @@ for _ in range(START_NUMBER_OF_BLOBS):
 for x in range(3): blobs.append(Carnivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], window, SIMULATION_SIZE))
     
 
+foods.sort(key=lambda f: f.pos[0])
+blobs.sort(key=lambda b: b.pos[0])
 
 
 def checkIfEaten():
@@ -67,8 +69,6 @@ def checkIfEaten():
     global blobs
 
     
-    # foods.sort(key=lambda f: f.pos[0])
-    # blobs.sort(key=lambda b: b.pos[0])
 
 
     for blob in blobs:
