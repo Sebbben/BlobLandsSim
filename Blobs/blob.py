@@ -123,17 +123,7 @@ class Blob:
     def checkIfTooLarge(self,blobs:list):
         if self.readyToSplitt():
             self.dead = True
-            babies = self.split()
-            for b in babies:
-                for bIndex, blob in enumerate(blobs):
-                    if blob.pos[0]>b.pos[0]:
-                        blobs.insert(bIndex)
-                        break
-
-        print([int(b.pos[0]) for b in blobs])
-        print(all([blobs[i].pos[0] < blobs[i+1].pos[0] for i in range(len(blobs)-1)]), len(blobs))
-
-
+            blobs += self.split()
 
     def newTarget(self):
         return [random.randint(0,self.SIMULATION_SIZE[0]-ceil(self.size)), random.randint(0, self.SIMULATION_SIZE[1]-ceil(self.size))]
@@ -171,66 +161,6 @@ class Blob:
             if dist < min:      
                 self.target = f.pos
                 min = dist
-            
-            
-
-    def getClose(self, lists):
-
-        [xSorted,ySorted] = lists
-
-        upper = len(xSorted)
-        lower = 0
-
-        mid = lambda: (upper + lower) // 2
-        xFind = []        
-
-        while upper > lower:
-            x = mid()
-            if self.pos[0]-self.size*2 < xSorted[x].pos[0] < self.pos[0]+self.size*2 and xSorted[x] != self:
-                for i in range(x, upper):
-                    if xSorted[i].pos[0] < self.pos[0]+self.size*2:
-                        xFind.append(xSorted[i])
-                    else:
-                        break
-                for i in range(x-1, lower, -1):
-                    if self.pos[0]-self.size*2 < xSorted[i].pos[0]:
-                        xFind.append(xSorted[i])
-                    else:
-                        break
-                # sleep(1)
-                break
-            elif xSorted[x].pos[0] > self.pos[0]+self.size*2:
-                upper = x - 1
-            else:
-                lower = x + 1
-
-
-        upper = len(ySorted)
-        lower = 0
-
-        yFind = []        
         
-        while upper > lower:
-            x = mid()
-            if self.pos[1]-self.size*2 < ySorted[x].pos[1] < self.pos[1]+self.size*2 and ySorted[x] != self:
-                for i in range(x, upper):
-                    if ySorted[i].pos[1] < self.pos[1]+self.size*2:
-                        yFind.append(ySorted[i])
-                    else:
-                        break
-                for i in range(x-1, lower, -1):
-                    if self.pos[1]-self.size*2 < ySorted[i].pos[1]:
-                        yFind.append(ySorted[i])
-                    else:
-                        break
-                break
-            elif ySorted[x].pos[1] > self.pos[1]+self.size*2:
-                upper = x - 1
-            else:
-                lower = x + 1
-
-
-        inRange = [x for x in xFind if x in yFind]
-        return inRange
 
 from Blobs.blobFactory import BlobFactory # DO NOT MOVE, NEEDS TO MAKE IMPORT AS LAST THING THAT HAPPENES IN FILE
