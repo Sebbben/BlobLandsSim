@@ -9,268 +9,243 @@ from camera import Camera
 
 from settings import *
 
-SPEED = 1
-SEE_TARGET_LINES = False
-lastBlobInfo = None
-paused = False
 
-camMovingRight = False
-camMovingLeft = False
-camMovingUp = False
-camMovingDown = False
+class Game:
 
+    def __init__(self):
+        self.SPEED = 1
+        self.SEE_TARGET_LINES = False
+        self.lastBlobInfo = None
+        self.paused = False
 
+        self.camMovingRight = False
+        self.camMovingLeft = False
+        self.camMovingUp = False
+        self.camMovingDown = False
 
-pygame.init()
+        pygame.init()
 
+        self.window = pygame.display.set_mode(WINDOW_RES, pygame.RESIZABLE)
+        pygame.display.set_caption("BlobLandSim")
 
+        self.cam = Camera(self.window, SIMULATION_SIZE)
+        self.cam.center()
 
-window = pygame.display.set_mode(WINDOW_RES, pygame.RESIZABLE)
-pygame.display.set_caption("BlobLandSim")
-
-cam = Camera(window, SIMULATION_SIZE)
-cam.center()
-
-fpsClock = pygame.time.Clock()
-
-
-blobs = []
-foods = []
-
-for _ in range(FOOD_AMOUNT//2):
-    foods.append(Food(window,SIMULATION_SIZE, age=random.randint(0,FPS*20)))
+        self.fpsClock = pygame.time.Clock()
 
 
-for _ in range(START_NUMBER_OF_BLOBS):
-    blob = Herbivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], window, SIMULATION_SIZE)
-    blobs.append(blob)
+        self.blobs = []
+        self.foods = []
 
-for x in range(3): blobs.append(Carnivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], window, SIMULATION_SIZE))
-    
+        self.populateLists()
 
-foods.sort(key=lambda f: f.pos[0])
-blobs.sort(key=lambda b: b.pos[0])
+    def start(self):
+        while True:
+            self.window.fill((255, 255, 255))
 
+            if len(self.blobs) == 0:
+                self.quitGame()
 
-def checkIfEaten():
-    global foods
-    global blobs
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.quitGame()
 
-    
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    self.handleMouseDown(event)
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    self.handleMouseUp(event)
+                elif event.type == pygame.KEYDOWN:
+                    self.handleKeyDown(event)
+                elif event.type == pygame.KEYUP:
+                    self.handleKeyUp(event)
 
+            self.updateCam()
 
-    for blob in blobs:
-        if isinstance(blob, Herbivore):
-            blob.eat(foods)
-        elif isinstance(blob, Carnivore):
-            blob.eat(blobs,FPS)
-        elif isinstance(blob, Parasite):
-            blob.eat()
-            
+                
+            if not self.paused: self.update() 
+            else: self.showStats()
+            self.draw()    
+                
 
-                           
-            
-def checkIfRottenFood():
-    global foods
-    foods = [food for food in foods if food.notRotten()]
+            pygame.display.flip()
 
-def getBlobInfo():
-    global blobs
-    global lastBlobInfo
+            self.fpsClock.tick(FPS)
 
-    lastBlobInfo = None
-    mousePos = pygame.mouse.get_pos()
-
-    for blob in blobs:
-        if math.dist(cam.getScreenPos(blob.pos), mousePos) < blob.size * cam.zoomLvl:
-            lastBlobInfo = blob
-            cam.zoomTarget = 1
-
-def update():
-    global blobs
-    global foods
-    
-
-    # if random.randint(1, round(FPS/20)) == 1:
-    if random.randint(1, 2) == 1:
-        foods.append(Food(window, SIMULATION_SIZE))
+    def update(self):
         
-    for food in foods:
-        food.update()
-    
-    for blob in blobs:
-        blob.update(blobs,food,SPEED,FPS)
+        # if random.randint(1, round(FPS/20)) == 1:
+        if random.randint(1, 2) == 1:
+            self.foods.append(Food(self.window, SIMULATION_SIZE))
+            
+        for food in self.foods:
+            food.update()
+        
+        for blob in self.blobs:
+            blob.update(self.blobs,food,self.SPEED,FPS)
 
-    if lastBlobInfo: 
-        [posX,posY] = cam.getScreenPos(lastBlobInfo.pos)
-        cam.nonSmoothMove([posX-window.get_width()//2, posY-window.get_height()//2])
-    
-    blobs = [blob for blob in blobs if not blob.dead]
+        if self.lastBlobInfo: 
+            [posX,posY] = self.cam.getScreenPos(self.lastBlobInfo.pos)
+            self.cam.nonSmoothMove([posX-self.window.get_width()//2, posY-self.window.get_height()//2])
+        
+        self.blobs = [blob for blob in self.blobs if not blob.dead]
 
-    checkIfRottenFood()
-    checkIfEaten()
-    
-    
-def draw():
-    global lastBlobInfo
+        self.checkIfRottenFood()
+        self.checkIfEaten()
+        
+    def draw(self):
 
-    for food in foods:
-        food.draw(cam)
-    
-    for blob in blobs:
-        blob.draw(cam, SEE_TARGET_LINES)
+        for food in self.foods:
+            food.draw(self.cam)
+        
+        for blob in self.blobs:
+            blob.draw(self.cam, self.SEE_TARGET_LINES)
 
-    if pygame.font and lastBlobInfo:
-        f = pygame.font.Font(None, 32)
-        text = f.render(str(lastBlobInfo.dna),True, (0,0,0))
-        textPos = text.get_rect(centerx=window.convert().get_width()/2, y=10)
-        window.blit(text,textPos)
+        if pygame.font and self.lastBlobInfo:
+            f = pygame.font.Font(None, 32)
+            text = f.render(str(self.lastBlobInfo.dna),True, (0,0,0))
+            textPos = text.get_rect(centerx=self.window.convert().get_width()/2, y=10)
+            self.window.blit(text,textPos)
 
-    cam.update()
+        self.cam.update()
 
+    def populateLists(self):
+        for _ in range(FOOD_AMOUNT//2):
+            self.foods.append(Food(self.window,SIMULATION_SIZE, age=random.randint(0,FPS*20)))
+
+
+        for _ in range(START_NUMBER_OF_BLOBS):
+            blob = Herbivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window, SIMULATION_SIZE)
+            self.blobs.append(blob)
+
+        for _ in range(3): self.blobs.append(Carnivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window, SIMULATION_SIZE))
+            
+    def checkIfEaten(self):
+        
         
 
-def showStats():
-    global blobs
-    avrgVegiDna = {
-        "maxSize": [],
-        "minSize": [],
-    }
-    avrgMeatEaterDna = {
-        "maxSize": [],
-        "minSize": [],
-    }
-    for blob in blobs:
-        if isinstance(blob, Carnivore):
-            avrgMeatEaterDna["maxSize"].append(blob.dna["maxSize"])
-            avrgMeatEaterDna["minSize"].append(blob.dna["minSize"])
+        for blob in self.blobs:
+            if isinstance(blob, Herbivore):
+                blob.eat(self.foods)
+            elif isinstance(blob, Carnivore):
+                blob.eat(self.blobs,FPS)
+            elif isinstance(blob, Parasite):
+                blob.eat()
+               
+    def checkIfRottenFood(self):
+        
+        self.foods = [food for food in self.foods if food.notRotten()]
+
+    def getBlobInfo(self):
+        
+        self.lastBlobInfo = None
+        mousePos = pygame.mouse.get_pos()
+
+        for blob in self.blobs:
+            if math.dist(self.cam.getScreenPos(blob.pos), mousePos) < blob.size * self.cam.zoomLvl:
+                self.lastBlobInfo = blob
+                self.cam.zoomTarget = 1
+
+    def showStats(self):
+        
+        avrgVegiDna = {
+            "maxSize": [],
+            "minSize": [],
+        }
+        avrgMeatEaterDna = {
+            "maxSize": [],
+            "minSize": [],
+        }
+        for blob in self.blobs:
+            if isinstance(blob, Carnivore):
+                avrgMeatEaterDna["maxSize"].append(blob.dna["maxSize"])
+                avrgMeatEaterDna["minSize"].append(blob.dna["minSize"])
+            else:
+                avrgVegiDna["maxSize"].append(blob.dna["maxSize"])
+                avrgVegiDna["minSize"].append(blob.dna["minSize"])
+
+        if len(avrgVegiDna["maxSize"]):
+            for key in avrgVegiDna:
+                avrgVegiDna[key] = sum(avrgVegiDna[key])//len(avrgVegiDna[key])
+        if len(avrgMeatEaterDna["maxSize"]):
+            for key in avrgMeatEaterDna:
+                avrgMeatEaterDna[key] = sum(avrgMeatEaterDna[key])//len(avrgMeatEaterDna[key])
+
+        if pygame.font:
+            f = pygame.font.Font(None, 32)
+            text = f.render("Vegi:"+ str(avrgVegiDna) + " "*50 + "MeatEater: " + str(avrgMeatEaterDna),True, (0,0,0))
+            textPos = text.get_rect(centerx=self.window.convert().get_width()/2, y=10)
+            self.window.blit(text,textPos)
         else:
-            avrgVegiDna["maxSize"].append(blob.dna["maxSize"])
-            avrgVegiDna["minSize"].append(blob.dna["minSize"])
+            print("No font :(")
 
-    if len(avrgVegiDna["maxSize"]):
-        for key in avrgVegiDna:
-            avrgVegiDna[key] = sum(avrgVegiDna[key])//len(avrgVegiDna[key])
-    if len(avrgMeatEaterDna["maxSize"]):
-        for key in avrgMeatEaterDna:
-            avrgMeatEaterDna[key] = sum(avrgMeatEaterDna[key])//len(avrgMeatEaterDna[key])
-
-    if pygame.font:
-        f = pygame.font.Font(None, 32)
-        text = f.render("Vegi:"+ str(avrgVegiDna) + " "*50 + "MeatEater: " + str(avrgMeatEaterDna),True, (0,0,0))
-        textPos = text.get_rect(centerx=window.convert().get_width()/2, y=10)
-        window.blit(text,textPos)
-    else:
-        print("No font :(")
+    def p(self):
+        profile = cProfile.Profile()
+        profile.runcall(self.update)
+        ps = pstats.Stats(profile)
+        ps.print_stats()
 
 
+        exit()
 
+    def handleMouseUp(self,event):
+        if event.button == 1:
+            self.getBlobInfo()
 
+    def handleMouseDown(self,event):
+        if event.button == 4:
+            self.cam.zoom(0.1)
+        elif event.button == 5:
+            self.cam.zoom(-0.1)
 
-def p():
-    profile = cProfile.Profile()
-    profile.runcall(update)
-    ps = pstats.Stats(profile)
-    ps.print_stats()
+    def handleKeyDown(self,event):
+        pass
 
+    def handleKeyUp(self,event):
+        
+        if event.key == pygame.K_SPACE:
+            self.paused = not self.paused
+        elif event.key == pygame.K_ESCAPE:
+            self.quitGame()
+        elif event.key == pygame.K_BACKSPACE:
+            self.p()
+        elif event.key == pygame.K_f:
+            self.blobs = [blob for blob in self.blobs if random.randint(0,2)]
+        elif event.key == pygame.K_UP:
+            self.SPEED += 0.1
+        elif event.key == pygame.K_DOWN:
+            self.SPEED -= 0.1
+        elif event.key == pygame.K_LSHIFT:
+            self.cam.zoom(0.1)
+        elif event.key == pygame.K_LCTRL:
+            self.cam.zoom(-0.1)
+        elif event.key == pygame.K_t:
+            self.SEE_TARGET_LINES = not self.SEE_TARGET_LINES
+        elif event.key == pygame.K_RETURN:
+            self.cam.center()
 
-    exit()
+    def updateCam(self):
+        keys = pygame.key.get_pressed()
 
+        camMovingLeft = keys[pygame.K_a]
+        camMovingRight = keys[pygame.K_d]
+        camMovingUp = keys[pygame.K_w]
+        camMovingDown = keys[pygame.K_s]
 
-def handleMouseUp(event):
-    if event.button == 1:
-        getBlobInfo()
+        
+        camMoveX = (camMovingRight-camMovingLeft) * CAMERA_SPEED
+        camMoveY = (camMovingDown-camMovingUp) * CAMERA_SPEED
 
-def handleMouseDown(event):
-    if event.button == 4:
-        cam.zoom(0.1)
-    elif event.button == 5:
-        cam.zoom(-0.1)
+        mouseMovement = pygame.mouse.get_rel() # needs to get called every frame to get accurate readings
+        if pygame.mouse.get_pressed()[0]:
+            self.cam.nonSmoothMove([-mouseMovement[0], -mouseMovement[1]])
+            
+        self.cam.moveTarget(camMoveX, camMoveY)
 
-def handleKeyDown(event):
-    pass
-
-
-def handleKeyUp(event):
-    global SPEED
-    global SEE_TARGET_LINES
-    global blobs
-    if event.key == pygame.K_SPACE:
-        global paused
-        paused = not paused
-    elif event.key == pygame.K_ESCAPE:
-        quitGame()
-    elif event.key == pygame.K_BACKSPACE:
-        p()
-    elif event.key == pygame.K_f:
-        blobs = [blob for blob in blobs if random.randint(0,2)]
-    elif event.key == pygame.K_UP:
-        SPEED += 0.1
-    elif event.key == pygame.K_DOWN:
-        SPEED -= 0.1
-    elif event.key == pygame.K_LSHIFT:
-        cam.zoom(0.1)
-    elif event.key == pygame.K_LCTRL:
-        cam.zoom(-0.1)
-    elif event.key == pygame.K_t:
-        SEE_TARGET_LINES = not SEE_TARGET_LINES
-    elif event.key == pygame.K_RETURN:
-        cam.center()
-
-def updateCam():
-    keys = pygame.key.get_pressed()
-
-    camMovingLeft = keys[pygame.K_a]
-    camMovingRight = keys[pygame.K_d]
-    camMovingUp = keys[pygame.K_w]
-    camMovingDown = keys[pygame.K_s]
+    def quitGame(self):
+        pygame.quit()
+        sys.exit()
 
     
-    camMoveX = (camMovingRight-camMovingLeft) * CAMERA_SPEED
-    camMoveY = (camMovingDown-camMovingUp) * CAMERA_SPEED
 
-    mouseMovement = pygame.mouse.get_rel() # needs to get called every frame to get accurate readings
-    if pygame.mouse.get_pressed()[0]:
-        cam.nonSmoothMove([-mouseMovement[0], -mouseMovement[1]])
-        
-    cam.moveTarget(camMoveX, camMoveY)
-
-def quitGame():
-    pygame.quit()
-    sys.exit()
-
-
-while True:
-    window.fill((255, 255, 255))
-
-    if len(blobs) == 0:
-        quitGame()
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            quitGame()
-
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            handleMouseDown(event)
-        elif event.type == pygame.MOUSEBUTTONUP:
-            handleMouseUp(event)
-        elif event.type == pygame.KEYDOWN:
-            handleKeyDown(event)
-        elif event.type == pygame.KEYUP:
-            handleKeyUp(event)
-
-    updateCam()
-
-        
-    if not paused: update() 
-    else: showStats()
-    draw()    
-        
-
-    pygame.display.flip()
-
-    fpsClock.tick(FPS)
-
-
-
-
+game = Game()
+game.start()

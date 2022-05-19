@@ -6,7 +6,7 @@ from settings import FOOD_COLOR
 class Food:
     def __init__(self, window, SIMULATION_SIZE, age = 0) -> None:
         self.size = ri(5,10)
-        self.color = FOOD_COLOR
+        self.color = FOOD_COLOR()
         self.maxAge = (30)*20  #  (FPS) * seconds
         self.age = age
 
