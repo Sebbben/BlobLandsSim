@@ -2,6 +2,7 @@ import math
 from Blobs.blob import Blob
 from math import sqrt
 
+from settings import *
 
 class Parasite(Blob):
     def __init__(self, size:float, pos:list, window, SIMULATION_SIZE:list, dna = {}):
@@ -13,10 +14,10 @@ class Parasite(Blob):
         if not dna:
             self.dna["maxSize"] = 20
 
-        self.color = (255,255,0)
+        self.color = PARASITE_COLOR
         self.host = None
         self.leachAmount = 5
-        self.energyConsumption = 1/1000
+        self.energyConsumption = PARASITE_ENERGY_CONSUMPTION
         self.speed = 1/2
 
         self.hostlessTimerResetTime = 1200

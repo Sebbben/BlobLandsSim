@@ -1,14 +1,14 @@
 import random
 from math import sqrt
 from Blobs.blob import Blob
+from settings import *
 
 class Carnivore(Blob):
     def __init__(self, size:float, pos:list, window, SIMULATION_SIZE:list, dna = {}):
-        from Blobs.herbivore import Herbivore
         super().__init__(size, pos, window, SIMULATION_SIZE, dna)
 
-        self.energyConsumption = 1/450
-        self.color = (200,50,50)
+        self.energyConsumption = CARNIVORE_ENERGY_CONSUMPTION
+        self.color = CARNIVORE_COLOR
         self.eatCooldown = self.size * 3
         self.eatEfficiency = 1
         self.isSeeFrame = False

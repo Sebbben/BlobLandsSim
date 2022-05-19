@@ -1,10 +1,12 @@
 import pygame
 from random import randint as ri
 
+from settings import FOOD_COLOR
+
 class Food:
     def __init__(self, window, SIMULATION_SIZE, age = 0) -> None:
         self.size = ri(5,10)
-        self.color = (0,ri(180,255),0)
+        self.color = FOOD_COLOR
         self.maxAge = (30)*20  #  (FPS) * seconds
         self.age = age
 
@@ -19,7 +21,6 @@ class Food:
         pass
 
     def draw(self, camera):
-        cameraX, cameraY = camera.pos
         pygame.draw.circle(self.window, self.color, camera.getScreenPos(self.pos), self.size*camera.zoomLvl)
     
     def notRotten(self):

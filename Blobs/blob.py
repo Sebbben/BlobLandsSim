@@ -4,6 +4,8 @@ import math
 import pygame
 import random
 
+from settings import *
+
 
 class Blob:
     def __init__(self, size:float, pos:list, window, SIMULATION_SIZE:list, dna = {}) -> None:
@@ -14,9 +16,9 @@ class Blob:
 
         self.eatEfficiency = 1
         self.dead = False
-        self.MIN_BLOB_SIZE = 5
+        self.MIN_BLOB_SIZE = MIN_BLOB_SIZE
         self.speed = 4
-        self.color = (100,70,19)
+        self.color = (0,0,0)
         self.target = None
         self.energyConsumption = 1/100
 

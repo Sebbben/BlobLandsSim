@@ -2,10 +2,15 @@ import random
 from Blobs.blob import Blob
 from math import sqrt
 
+from settings import *
+
 class Herbivore(Blob):
     def __init__(self, size:float, pos:list, window, SIMULATION_SIZE:list, dna = {}):
         super().__init__(size, pos, window, SIMULATION_SIZE, dna)
         self.isSeeFrame = False
+        self.color = HERBIVORE_COLOR
+        self.energyConsumption = HERBIVORE_ENERGY_CONSUMPTION
+
 
     def move(self):
         self.updateTarget()

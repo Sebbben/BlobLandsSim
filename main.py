@@ -7,20 +7,10 @@ from Blobs.parasite import Parasite
 from food import Food
 from camera import Camera
 
-FPS = 120 # frames per second setting
-WIN_W = 1920
-WIN_H = 1080
+from settings import *
 
-SIMULATION_SIZE = [3000, 3000]
-FOOD_DENCITY = 1/7000
-FOOD_AMOUNT = int((SIMULATION_SIZE[0]*SIMULATION_SIZE[1])*FOOD_DENCITY)
-START_NUMBER_OF_BLOBS = 20
-START_BLOB_SIZE = 20
-CAMERA_SPEED = 10
 SPEED = 1
-WINDOW_RES = (1080,720)
 SEE_TARGET_LINES = False
-
 lastBlobInfo = None
 paused = False
 
@@ -35,9 +25,7 @@ pygame.init()
 
 
 
-# window = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
 window = pygame.display.set_mode(WINDOW_RES, pygame.RESIZABLE)
-
 pygame.display.set_caption("BlobLandSim")
 
 cam = Camera(window, SIMULATION_SIZE)
