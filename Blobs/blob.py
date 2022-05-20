@@ -169,20 +169,25 @@ class Blob:
         self.checkIfTooLarge(blobs)
         
     def see(self, nearbyFoods):
-        closest = nearbyFoods[0]
+        if id(nearbyFoods[0]) != id(self):        
+            closest = nearbyFoods[0]
+        else:
+            closest = nearbyFoods[1]
         closestdist = self.distTo(closest.pos)
                 
         for f in nearbyFoods:
             
             dist = self.distTo(f.pos)
             #if self.distTo(f.pos) < self.dna["seeRange"]:
-            if dist < closestdist:    
+            if dist < closestdist and id(f) != id(self):    
                 closestdist = dist  
                 closest = f
                 
 
-        if closestdist < self.dna["seeRange"]:
+        if closestdist < self.dna["seeRange"] or True:
             self.target = closest.pos
+            if (self.color == CARNIVORE_COLOR):
+                print("Following!")
             
         
         
