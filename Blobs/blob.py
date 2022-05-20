@@ -29,8 +29,9 @@ class Blob:
         self.dnaClamp = {
             "maxSize":[30, 160],
             "minSize": [15,50],
-            "seeRange": [0, 10],
-            "seeChance": [0,1]
+            "seeRange": [0, 20],
+            "seeChance": [0,1],
+            "speed": [0, 100]
         }
 
         if dna:
@@ -40,8 +41,10 @@ class Blob:
                 "maxSize": 80,
                 "minSize": 20,
                 "type":"Herbivore",
-                "seeRange":3,
-                "seeChance":0.2
+                "seeRange":5,
+                "seeChance":0.5,
+                "rgb":[0, 0, 0],
+                "speed":50
             }
 
 
@@ -76,7 +79,9 @@ class Blob:
 
     def mutate(self):
         dnaKeys = list(self.dna.keys())
-        for _ in random.choices([0,1,2],[45,50,5]):
+        i = 0
+        for _ in range(random.choices([0,1,2,3,4,5,6],[20,15,30,15,10,5,5])[0]):
+            i += 1
             geneToMod = dnaKeys[random.randint(0,len(dnaKeys)-1)]
             if geneToMod == "maxSize":
                 self.dna[geneToMod] += random.randint(-int(self.dna[geneToMod]*self.MAX_MUTATION),int(self.dna[geneToMod]*self.MAX_MUTATION))
@@ -87,16 +92,24 @@ class Blob:
             elif geneToMod == "seeRange":
                 self.dna[geneToMod] += random.uniform(-0.5, 0.5)
             elif geneToMod == "seeChance":
-                self.dna[geneToMod] += random.uniform(-0.1, 0.1)
+                self.dna[geneToMod] += random.uniform(-0.2, 0.2)
+            elif geneToMod == "rgb":
+                for __ in range(random.randint(1, 4)):
+                    self.dna[geneToMod][random.randint(0, 2)] += random.randint(-25, 25)
+            elif geneToMod == "speed":
+                self.dna[geneToMod] += random.randint(-10, 10)
+                
+        print(f"Mutate {i}")
 
 
         self.clampMutations()
 
     def draw(self, camera, drawLines):
+        color = [sorted([0, self.color[0] + self.dna["rgb"][0], 255])[1], sorted([0, self.color[1] + self.dna["rgb"][1], 255])[1], sorted([0, self.color[2] + self.dna["rgb"][2], 255])[1]]
         if drawLines:
-            pygame.draw.line(self.window, self.color, camera.getScreenPos(self.pos), camera.getScreenPos(self.target), width=round(2*camera.zoomLvl))
+            pygame.draw.line(self.window, color, camera.getScreenPos(self.pos), camera.getScreenPos(self.target), width=max(round(2*camera.zoomLvl), 1))
 
-        pygame.draw.circle(self.window, self.color, camera.getScreenPos(self.pos), round(self.size*camera.zoomLvl))
+        pygame.draw.circle(self.window, color, camera.getScreenPos(self.pos), round(self.size*camera.zoomLvl))
         
     def distTo(self, otherPos):
         return math.dist(otherPos,self.pos)
@@ -134,7 +147,7 @@ class Blob:
     def updateTarget(self):
         if self.target == None or self.distTo(self.target) < self.size - self.speed * self.gamespeed:
             self.getNewTarget()
-            self.makeMoveVector(self.target[0], self.target[1], self.speed * self.gamespeed)
+            self.makeMoveVector(self.target[0], self.target[1], self.speed * self.gamespeed * (self.dna["speed"]/50))
             
     def getNewTarget(self):
         self.target = self.newTarget()
@@ -146,7 +159,7 @@ class Blob:
 
     def update(self, blobs, foods, gamespeed, FPS):
         self.gamespeed = gamespeed
-        self.size -= self.energyConsumption*self.gamespeed
+        self.size -= self.energyConsumption*self.gamespeed*(self.dna["speed"]/50)
         self.eatCooldown = max(-1, self.eatCooldown-1)
         self.FPS = FPS
 
@@ -156,13 +169,22 @@ class Blob:
         self.checkIfTooLarge(blobs)
         
     def see(self, nearbyFoods):
-        min = self.distTo(nearbyFoods[0].pos)
+        closest = nearbyFoods[0]
+        closestdist = self.distTo(closest.pos)
+                
         for f in nearbyFoods:
+            
             dist = self.distTo(f.pos)
             #if self.distTo(f.pos) < self.dna["seeRange"]:
-            if dist < min:      
-                self.target = f.pos
-                min = dist
+            if dist < closestdist:    
+                closestdist = dist  
+                closest = f
+                
+
+        if closestdist < self.dna["seeRange"]:
+            self.target = closest.pos
+            
+        
         
 
 from Blobs.blobFactory import BlobFactory # DO NOT MOVE, NEEDS TO MAKE IMPORT AS LAST THING THAT HAPPENES IN FILE
