@@ -28,7 +28,8 @@ class Herbivore(Blob):
             if food.pos[0]<self.pos[0]-self.size*2 or food.pos[0]>self.pos[0]+self.size*2: # skip if food is too far left or right of self
                 newFoods.append(food)
                 continue 
-            if self.distTo(food.pos) < self.size-(food.size):
+            #if self.distTo(food.pos) < self.size-(food.size):
+            if self.distTo(food.pos) < self.size+(food.size/2):
                 self.size = sqrt(self.size**2 + food.size**2).real
             else:
                 newFoods.append(food)
@@ -37,6 +38,7 @@ class Herbivore(Blob):
 
         if self.isSeeFrame: 
             self.see(foods)
+            self.size -= self.energyConsumption*(self.dna["speed"]/50)*5
             self.isSeeFrame = False
             
         self.makeMoveVector(self.target[0], self.target[1], self.speed * self.gamespeed)
