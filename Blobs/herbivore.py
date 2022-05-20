@@ -20,7 +20,7 @@ class Herbivore(Blob):
 
     def getNewTarget(self):
         super().getNewTarget()
-        self.isSeeFrame = (random.randint(1, self.dna["seeChance"]) == 1) 
+        self.isSeeFrame = (random.randint(1, 100) < 100*self.dna["seeChance"]) 
 
     def eat(self, foods:list):
         newFoods = []

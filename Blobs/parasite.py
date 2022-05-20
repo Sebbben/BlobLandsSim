@@ -20,7 +20,7 @@ class Parasite(Blob):
         self.energyConsumption = PARASITE_ENERGY_CONSUMPTION
         self.speed = 1/2
 
-        self.hostlessTimerResetTime = 1200
+        self.hostlessTimerResetTime = 2400
         self.hostlessTimer = self.hostlessTimerResetTime
 
     def update(self, blobs, food, gamespeed, FPS):

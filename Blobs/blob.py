@@ -30,7 +30,7 @@ class Blob:
             "maxSize":[30, 160],
             "minSize": [15,50],
             "seeRange": [0, 10],
-            "seeChance": [1, 50]
+            "seeChance": [0,1]
         }
 
         if dna:
@@ -41,7 +41,7 @@ class Blob:
                 "minSize": 20,
                 "type":"Herbivore",
                 "seeRange":3,
-                "seeChance":5
+                "seeChance":0.2
             }
 
 
@@ -87,7 +87,7 @@ class Blob:
             elif geneToMod == "seeRange":
                 self.dna[geneToMod] += random.uniform(-0.5, 0.5)
             elif geneToMod == "seeChance":
-                self.dna[geneToMod] += random.randint(-1, 1)
+                self.dna[geneToMod] += random.uniform(-0.1, 0.1)
 
 
         self.clampMutations()
