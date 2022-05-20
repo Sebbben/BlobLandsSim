@@ -12,12 +12,13 @@ FOOD_COLOR = lambda: (0,ri(180,255),0)
 
 START_NUMBER_OF_BLOBS = 20
 START_BLOB_SIZE = 20
+
 CAMERA_SPEED = 10
 WINDOW_RES = (1080,720)
 
 
-
 # ---------- general blob settings ---------
+ 
 MIN_BLOB_SIZE = 5
 
 # ---------- per blob settings ----------- 

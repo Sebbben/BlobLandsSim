@@ -1,10 +1,10 @@
 import pygame
 from random import randint as ri
 
-from settings import FOOD_COLOR
+from settings import *
 
 class Food:
-    def __init__(self, window, SIMULATION_SIZE, age = 0) -> None:
+    def __init__(self, window, age = 0) -> None:
         self.size = ri(5,10)
         self.color = FOOD_COLOR()
         self.maxAge = (30)*20  #  (FPS) * seconds

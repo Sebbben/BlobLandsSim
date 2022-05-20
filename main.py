@@ -28,7 +28,7 @@ class Game:
         self.window = pygame.display.set_mode(WINDOW_RES, pygame.RESIZABLE)
         pygame.display.set_caption("BlobLandSim")
 
-        self.cam = Camera(self.window, SIMULATION_SIZE)
+        self.cam = Camera(self.window)
         self.cam.center()
 
         self.fpsClock = pygame.time.Clock()
@@ -75,7 +75,7 @@ class Game:
         
         # if random.randint(1, round(FPS/20)) == 1:
         if random.randint(1, 2) == 1:
-            self.foods.append(Food(self.window, SIMULATION_SIZE))
+            self.foods.append(Food(self.window))
             
         for food in self.foods:
             food.update()
@@ -110,29 +110,25 @@ class Game:
 
     def populateLists(self):
         for _ in range(FOOD_AMOUNT//2):
-            self.foods.append(Food(self.window,SIMULATION_SIZE, age=random.randint(0,FPS*20)))
+            self.foods.append(Food(self.window, age=random.randint(0,FPS*20)))
 
 
         for _ in range(START_NUMBER_OF_BLOBS):
-            blob = Herbivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window, SIMULATION_SIZE)
+            blob = Herbivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window)
             self.blobs.append(blob)
 
-        for _ in range(3): self.blobs.append(Carnivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window, SIMULATION_SIZE))
+        for _ in range(3): self.blobs.append(Carnivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window))
             
     def checkIfEaten(self):
-        
-        
-
         for blob in self.blobs:
             if isinstance(blob, Herbivore):
                 blob.eat(self.foods)
             elif isinstance(blob, Carnivore):
-                blob.eat(self.blobs,FPS)
+                blob.eat(self.blobs)
             elif isinstance(blob, Parasite):
                 blob.eat()
                
     def checkIfRottenFood(self):
-        
         self.foods = [food for food in self.foods if food.notRotten()]
 
     def getBlobInfo(self):

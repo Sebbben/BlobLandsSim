@@ -8,7 +8,7 @@ from settings import *
 
 
 class Blob:
-    def __init__(self, size:float, pos:list, window, SIMULATION_SIZE:list, dna = {}) -> None:
+    def __init__(self, size:float, pos:list, window, dna = {}) -> None:
         self.pos = pos
         self.size = size
 
@@ -58,7 +58,7 @@ class Blob:
             newX = self.pos[0]+random.randint(0,self.size//splittNumber)
             newY = self.pos[1]+random.randint(0,self.size//splittNumber)
 
-            blob = BlobFactory().createBlob(newSize, [newX,newY], self.window, self.SIMULATION_SIZE, self.dna)
+            blob = BlobFactory().createBlob(newSize, [newX,newY], self.window, self.dna)
 
             newBlobs.append(blob)
         return newBlobs
@@ -144,7 +144,7 @@ class Blob:
     def move():
         pass
 
-    def update(self, blobs, food, gamespeed, FPS):
+    def update(self, blobs, foods, gamespeed, FPS):
         self.gamespeed = gamespeed
         self.size -= self.energyConsumption*self.gamespeed
         self.eatCooldown = max(-1, self.eatCooldown-1)

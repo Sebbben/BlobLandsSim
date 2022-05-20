@@ -1,15 +1,14 @@
-from math import dist
-
+from settings import *
 
 class Camera:
-    def __init__(self, window, simulationsize):
+    def __init__(self, window):
         self.pos = [0,0]
         self.target = self.pos.copy()
         self.smoothness = 1/50
         self.zoomLvl = 1
         self.zoomTarget = 1
         self.window = window
-        self.simsize = simulationsize
+        self.simsize = SIMULATION_SIZE
         
     def nonSmoothMove(self, pos:list):
         self.target[0] += pos[0]

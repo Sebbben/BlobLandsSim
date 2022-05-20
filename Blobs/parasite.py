@@ -5,8 +5,8 @@ from math import sqrt
 from settings import *
 
 class Parasite(Blob):
-    def __init__(self, size:float, pos:list, window, SIMULATION_SIZE:list, dna = {}):
-        super().__init__(size, pos, window, SIMULATION_SIZE, dna)
+    def __init__(self, size:float, pos:list, window, dna = {}):
+        super().__init__(size, pos, window, dna)
 
 
         self.dnaClamp["maxSize"] = [5,30]
