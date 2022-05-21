@@ -22,18 +22,19 @@ class Herbivore(Blob):
         self.isSeeFrame = (random.randint(1, 100) < 100*self.dna["seeChance"]) 
 
     def eat(self, foods:list):
-        newFoods = []
-        for food in foods:
-            if food.pos[0]<self.pos[0]-self.size*2 or food.pos[0]>self.pos[0]+self.size*2: # skip if food is too far left or right of self
-                newFoods.append(food)
-                continue 
-            #if self.distTo(food.pos) < self.size-(food.size):
+
+        close = self.getClose(foods)
+
+        newFoods = foods.copy()        
+
+        for food in close:
             if self.distTo(food.pos) < self.size+(food.size/2):
                 self.size = sqrt(self.size**2 + food.size**2).real
-            else:
-                newFoods.append(food)
+                newFoods.remove(food)
+
         foods.clear()
         foods.extend(newFoods)
+            
 
         if self.isSeeFrame: 
             self.see(foods)
