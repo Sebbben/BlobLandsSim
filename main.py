@@ -1,5 +1,8 @@
 import pygame, sys, random, math, cProfile, pstats
 
+import numpy as np
+import pandas as pd
+
 from Blobs.carnivore import Carnivore
 from Blobs.herbivore import Herbivore
 from Blobs.parasite import Parasite
@@ -10,6 +13,7 @@ from camera import Camera
 from settings import *
 
 
+
 class Game:
 
     def __init__(self):
@@ -17,6 +21,8 @@ class Game:
         self.SEE_TARGET_LINES = False
         self.lastBlobInfo = None
         self.paused = False
+        self.dataCollectionNumber = 0
+        self.data = []
 
         self.camMovingRight = False
         self.camMovingLeft = False
@@ -33,7 +39,6 @@ class Game:
 
         self.fpsClock = pygame.time.Clock()
 
-
         self.blobs = []
         self.foods = []
 
@@ -41,6 +46,7 @@ class Game:
 
     def start(self):
         while True:
+            
             self.window.fill((255, 255, 255))
 
             if len(self.blobs) == 0:

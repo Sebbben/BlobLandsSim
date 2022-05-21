@@ -16,6 +16,10 @@ START_BLOB_SIZE = 20
 CAMERA_SPEED = 10
 WINDOW_RES = (1080,720)
 
+# data collection settings
+
+DATA_COLLECTION_TIME_INTERVAL = 1
+
 
 # ---------- general blob settings ---------
  
