@@ -99,7 +99,7 @@ class Blob:
             elif geneToMod == "speed":
                 self.dna[geneToMod] += random.randint(-10, 10)
                 
-        print(f"Mutate {i}")
+        # print(f"Mutate {i}")
 
 
         self.clampMutations()
@@ -187,8 +187,67 @@ class Blob:
         if closestdist < self.dna["seeRange"] or True:
             self.target = closest.pos
             if (self.color == CARNIVORE_COLOR):
-                print("Following!")
+                # print("Following!")
+                pass
             
+    def getClose(self, sortedlists):
+
+        [xSorted,ySorted] = sortedlists
+
+        upper = len(xSorted)
+        lower = 0
+
+        mid = lambda: (upper + lower) // 2
+        xFind = []        
+
+        while upper > lower:
+            x = mid()
+            if self.pos[0]-self.size*2 < xSorted[x].pos[0] < self.pos[0]+self.size*2 and xSorted[x] != self:
+                for i in range(x, upper):
+                    if xSorted[i].pos[0] < self.pos[0]+self.size*2:
+                        xFind.append(xSorted[i])
+                    else:
+                        break
+                for i in range(x-1, lower, -1):
+                    if self.pos[0]-self.size*2 < xSorted[i].pos[0]:
+                        xFind.append(xSorted[i])
+                    else:
+                        break
+                # sleep(1)
+                break
+            elif xSorted[x].pos[0] > self.pos[0]+self.size*2:
+                upper = x - 1
+            else:
+                lower = x + 1
+
+
+        upper = len(ySorted)
+        lower = 0
+
+        yFind = []        
+        
+        while upper > lower:
+            x = mid()
+            if self.pos[1]-self.size*2 < ySorted[x].pos[1] < self.pos[1]+self.size*2 and ySorted[x] != self:
+                for i in range(x, upper):
+                    if ySorted[i].pos[1] < self.pos[1]+self.size*2:
+                        yFind.append(ySorted[i])
+                    else:
+                        break
+                for i in range(x-1, lower, -1):
+                    if self.pos[1]-self.size*2 < ySorted[i].pos[1]:
+                        yFind.append(ySorted[i])
+                    else:
+                        break
+                break
+            elif ySorted[x].pos[1] > self.pos[1]+self.size*2:
+                upper = x - 1
+            else:
+                lower = x + 1
+
+
+        inRange = [x for x in xFind if x in yFind]
+        return inRange
         
         
 

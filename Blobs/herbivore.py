@@ -11,7 +11,6 @@ class Herbivore(Blob):
         self.color = HERBIVORE_COLOR
         self.energyConsumption = HERBIVORE_ENERGY_CONSUMPTION
 
-
     def move(self):
         self.updateTarget()
 
@@ -42,5 +41,3 @@ class Herbivore(Blob):
             self.isSeeFrame = False
             
         self.makeMoveVector(self.target[0], self.target[1], self.speed * self.gamespeed)
-
-

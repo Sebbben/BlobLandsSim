@@ -1,8 +1,5 @@
 import pygame, sys, random, math, cProfile, pstats
 
-import numpy as np
-import pandas as pd
-
 from Blobs.carnivore import Carnivore
 from Blobs.herbivore import Herbivore
 from Blobs.parasite import Parasite
@@ -80,8 +77,12 @@ class Game:
         
         # if random.randint(1, round(FPS/20)) == 1:
         if random.randint(1, 2) == 1:
-            self.foods.append(Food(self.window))
-            
+            f = Food(self.window)
+            for i in range(len(self.foods)):
+                if self.foods[i].pos[0] > f.pos[0]:
+                    self.foods.insert(i, f)
+                    break        
+
         for food in self.foods:
             food.update()
         
@@ -96,6 +97,7 @@ class Game:
 
         self.checkIfRottenFood()
         self.checkIfEaten()
+
         
     def draw(self):
 
@@ -117,10 +119,11 @@ class Game:
         for _ in range(FOOD_AMOUNT//2):
             self.foods.append(Food(self.window, age=random.randint(0,FPS*20)))
 
+        self.foods.sort(key=lambda f:f.pos[0])
 
-        for _ in range(START_NUMBER_OF_BLOBS):
-            blob = Herbivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window)
-            self.blobs.append(blob)
+
+
+        for _ in range(START_NUMBER_OF_BLOBS): self.blobs.append(Herbivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window))
 
         for _ in range(3): self.blobs.append(Carnivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window))
             
