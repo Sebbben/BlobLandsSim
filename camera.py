@@ -64,6 +64,6 @@ class Camera:
 
         self.zoomTarget = min(zoomX,zoomY)-0.1
 
-
+    
     def getScreenPos(self, worldPos):
         return [int(worldPos[0] - self.pos[0]) *self.zoomLvl + self.window.get_width()/2, int(worldPos[1] - self.pos[1]) *self.zoomLvl + self.window.get_height()/2]

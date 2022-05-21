@@ -6,13 +6,17 @@ from settings import *
 
 class Parasite(Blob):
     def __init__(self, size:float, pos:list, window, dna = {}):
-        super().__init__(size, pos, window, dna)
+        
+        if not dna:
+            self.dna["maxSize"] = 20
+            super().__init__(size, pos, window, {"maxSize":20})
+        else:
+            super().__init__(size, pos, window, dna)
+
 
 
         self.dnaClamp["maxSize"] = [5,30]
 
-        if not dna:
-            self.dna["maxSize"] = 20
 
         self.color = PARASITE_COLOR
         self.host = None

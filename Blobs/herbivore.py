@@ -7,6 +7,7 @@ from settings import *
 class Herbivore(Blob):
     def __init__(self, size:float, pos:list, window, dna = {}):
         super().__init__(size, pos, window, dna)
+
         self.isSeeFrame = False
         self.color = HERBIVORE_COLOR
         self.energyConsumption = HERBIVORE_ENERGY_CONSUMPTION

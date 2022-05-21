@@ -34,18 +34,16 @@ class Blob:
             "speed": [0, 100]
         }
 
-        if dna:
-            self.dna = dna
-        else:
-            self.dna = {
-                "maxSize": 80,
-                "minSize": 20,
-                "type":"Herbivore",
-                "seeRange":5,
-                "seeChance":0.5,
-                "rgb":[0, 0, 0],
-                "speed":50
-            }
+    
+        self.dna = {
+            "maxSize": 80,
+            "minSize": 20,
+            "type":"Herbivore",
+            "seeRange":5,
+            "seeChance":0.5,
+            "rgb":[0, 0, 0],
+            "speed":50
+        } | dna
 
 
         self.mutate()
@@ -91,7 +89,7 @@ class Blob:
                 self.dna[geneToMod] += random.uniform(-0.2, 0.2)
             elif geneToMod == "rgb":
                 for __ in range(random.randint(1, 4)):
-                    self.dna[geneToMod][random.randint(0, 2)] += random.randint(-25, 25)
+                    self.dna[geneToMod][random.randint(0, 2)] += random.randint(-10, 10)
             elif geneToMod == "speed":
                 self.dna[geneToMod] += random.randint(-10, 10)
                 

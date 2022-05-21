@@ -63,7 +63,6 @@ class Game:
 
             self.updateCam()
 
-                
             if not self.paused: self.update() 
             else: self.showStats()
             self.draw()    
