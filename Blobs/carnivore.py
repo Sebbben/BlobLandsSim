@@ -1,4 +1,4 @@
-import random
+from random import randint as ri 
 from math import sqrt
 from Blobs.blob import Blob
 from settings import *
@@ -25,7 +25,7 @@ class Carnivore(Blob):
     
     def getNewTarget(self):
         super().getNewTarget()
-        if (random.randint(1, 100) < 100*self.dna["seeChance"]):
+        if (ri(1, 100) < 100*self.dna["seeChance"]):
             self.seeTime = 5
             
 

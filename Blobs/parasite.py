@@ -1,12 +1,11 @@
-import math
 from Blobs.blob import Blob
-from math import sqrt
+from math import sqrt, pi
 
 from settings import *
 
 class Parasite(Blob):
     def __init__(self, size:float, pos:list, window, dna = {}):
-        
+
         if not dna:
             self.dna["maxSize"] = 20
             super().__init__(size, pos, window, {"maxSize":20})
@@ -75,10 +74,10 @@ class Parasite(Blob):
     def eat(self):
         if self.host: # and isinstance(self.host, Carnivore):
 
-            if self.host.size**2-(self.leachAmount/math.pi) < 0:
+            if self.host.size**2-(self.leachAmount/pi) < 0:
                 self.host = None
                 self.setTarget(self.newRandomTarget())
                 return
 
-            self.host.size = sqrt(self.host.size**2-(self.leachAmount/math.pi)).real
-            self.size = sqrt(self.size**2+(self.leachAmount/math.pi)).real
+            self.host.size = sqrt(self.host.size**2-(self.leachAmount/pi)).real
+            self.size = sqrt(self.size**2+(self.leachAmount/pi)).real
