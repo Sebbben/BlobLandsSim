@@ -1,10 +1,10 @@
 from abc import abstractclassmethod
-from math import ceil
-import math
+from math import ceil, dist
 import pygame
 import random
 
 from settings import *
+from functions import clamp
 
 
 class Blob:
@@ -30,7 +30,7 @@ class Blob:
             "maxSize":[30, 160],
             "minSize": [15,50],
             "seeRange": [0, 20],
-            "seeChance": [0,1],
+            "seeChance": [0, 1],
             "speed": [0, 100]
         }
 
@@ -48,13 +48,13 @@ class Blob:
             }
 
 
-        
+        self.mutate()
+
         self.window = window
 
 
     def split(self):
         newBlobs = []
-        self.mutate()
         splittNumber = int(self.size // self.dna["minSize"])
         for _ in range(splittNumber):
             newSize = self.size//splittNumber
@@ -69,10 +69,8 @@ class Blob:
     def clampMutations(self):
         for key in self.dna:
             if not key in self.dnaClamp: continue
-            if len(self.dnaClamp) == 2:
-                self.dna[key] = max(self.dnaClamp[key][0], min(self.dnaClamp[key][1], self.dna[key]))
-            else:
-                self.dna[key] = max(self.dnaClamp[key][0], self.dna[key])
+            
+            self.dna[key] = clamp(self.dna[key], self.dnaClamp[key][0], self.dnaClamp[key][1])
                 
             
         
@@ -99,20 +97,22 @@ class Blob:
             elif geneToMod == "speed":
                 self.dna[geneToMod] += random.randint(-10, 10)
                 
-        # print(f"Mutate {i}")
-
-
         self.clampMutations()
 
     def draw(self, camera, drawLines):
-        color = [sorted([0, self.color[0] + self.dna["rgb"][0], 255])[1], sorted([0, self.color[1] + self.dna["rgb"][1], 255])[1], sorted([0, self.color[2] + self.dna["rgb"][2], 255])[1]]
+        
+        r = clamp(self.color[0] + self.dna["rgb"][0], 0, 255)
+        g = clamp(self.color[1] + self.dna["rgb"][1], 0, 255)
+        b = clamp(self.color[2] + self.dna["rgb"][2], 0, 255)
+
+        color = [r, g, b]
         if drawLines:
             pygame.draw.line(self.window, color, camera.getScreenPos(self.pos), camera.getScreenPos(self.target), width=max(round(2*camera.zoomLvl), 1))
 
         pygame.draw.circle(self.window, color, camera.getScreenPos(self.pos), round(self.size*camera.zoomLvl))
         
     def distTo(self, otherPos):
-        return math.dist(otherPos,self.pos)
+        return dist(otherPos,self.pos)
 
     def readyToSplitt(self) -> bool:
         return self.size > self.dna["maxSize"]
@@ -140,17 +140,17 @@ class Blob:
             self.dead = True
             blobs += self.split()
 
-    def newTarget(self):
+    def newRandomTarget(self):
         return [random.randint(0,self.SIMULATION_SIZE[0]-ceil(self.size)), random.randint(0, self.SIMULATION_SIZE[1]-ceil(self.size))]
         
+    def setTarget(self, pos):
+        self.target = pos
+        self.makeMoveVector(pos[0], pos[1], self.speed*self.gamespeed*(self.dna["speed"]/50))
 
     def updateTarget(self):
         if self.target == None or self.distTo(self.target) < self.size - self.speed * self.gamespeed:
-            self.getNewTarget()
-            self.makeMoveVector(self.target[0], self.target[1], self.speed * self.gamespeed * (self.dna["speed"]/50))
-            
-    def getNewTarget(self):
-        self.target = self.newTarget()
+            self.setTarget(self.newRandomTarget())            
+
         
 
     @abstractclassmethod
@@ -169,26 +169,25 @@ class Blob:
         self.checkIfTooLarge(blobs)
         
     def see(self, nearbyFoods):
-        if id(nearbyFoods[0]) != id(self):        
+
+        closest = None
+        if not nearbyFoods[0] is self:        
             closest = nearbyFoods[0]
         else:
             closest = nearbyFoods[1]
+
         closestdist = self.distTo(closest.pos)
-                
+
         for f in nearbyFoods:
             
             dist = self.distTo(f.pos)
-            #if self.distTo(f.pos) < self.dna["seeRange"]:
-            if dist < closestdist and id(f) != id(self):    
-                closestdist = dist  
+            if dist < closestdist and not f is self:    
+                closestdist = dist
                 closest = f
                 
+        if closestdist < self.dna["seeRange"]:
+            self.setTarget(closest.pos)
 
-        if closestdist < self.dna["seeRange"] or True:
-            self.target = closest.pos
-            if (self.color == CARNIVORE_COLOR):
-                # print("Following!")
-                pass
             
     def getClose(self, xSorted):
 

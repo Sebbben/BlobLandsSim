@@ -44,8 +44,7 @@ class Parasite(Blob):
         if self.host: # skip trying to get new host if it allready has one
             if self.host.size > self.size: # condition when parasite should leave host
                 self.host = None
-                self.getNewTarget()
-                self.makeMoveVector(self.target[0], self.target[1], self.speed * self.gamespeed)
+                self.setTarget(self.newRandomTarget())
             else: # if has host and everythin is a ok
                 return
 
@@ -74,8 +73,7 @@ class Parasite(Blob):
 
             if self.host.size**2-(self.leachAmount/math.pi) < 0:
                 self.host = None
-                self.getNewTarget()
-                self.makeMoveVector(self.target[0], self.target[1], self.speed * self.gamespeed)
+                self.setTarget(self.newRandomTarget())
                 return
 
             self.host.size = sqrt(self.host.size**2-(self.leachAmount/math.pi)).real
