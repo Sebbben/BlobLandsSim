@@ -55,7 +55,6 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.quitGame()
-
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     self.handleMouseDown(event)
                 elif event.type == pygame.MOUSEBUTTONUP:
@@ -108,7 +107,7 @@ class Game:
 
         if pygame.font and self.lastBlobInfo:
             f = pygame.font.Font(None, 32)
-            text = f.render(str(self.lastBlobInfo.dna),True, (0,0,0))
+            text = f.render(str(math.floor(self.lastBlobInfo.size*100)/100) + "," + str(self.lastBlobInfo.dna),True, (0,0,0))
             textPos = text.get_rect(centerx=self.window.convert().get_width()/2, y=10)
             self.window.blit(text,textPos)
 
