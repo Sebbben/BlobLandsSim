@@ -4,7 +4,7 @@ class Camera:
     def __init__(self, window):
         self.pos = [0,0]
         self.target = self.pos.copy()
-        self.smoothness = 1/50
+        self.smoothness = CAMERA_SMOOTHNESS
         self.zoomLvl = 1
         self.zoomTarget = 1
         self.window = window
@@ -27,7 +27,7 @@ class Camera:
         moveX = (self.target[0]-self.pos[0])*self.smoothness
         moveY = (self.target[1]-self.pos[1])*self.smoothness
         
-        if abs(moveX) + abs(moveY) < 0.1:
+        if abs(moveX) + abs(moveY) < CAMERA_MOVE_SNAP_DISTANCE:
             self.pos[0] = self.target[0]
             self.pos[1] = self.target[1]
         else:
@@ -35,7 +35,7 @@ class Camera:
             self.pos[1] += moveY
 
 
-        if round(abs(self.zoomTarget - self.zoomLvl),5) < 0.001:
+        if round(abs(self.zoomTarget - self.zoomLvl),5) < CAMERA_ZOOM_SNAP_DISTANCE:
             self.zoomLvl = self.zoomTarget
         else:
             self.zoomLvl += (self.zoomTarget - self.zoomLvl)*self.smoothness

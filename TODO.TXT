@@ -1,0 +1,7 @@
+-------------- BUGS --------------
+Parasites does not go off host when it is too small
+
+-------------- TODO --------------
+
+fix see scripts
+mabye translate code to use vectors

@@ -69,7 +69,7 @@ class Blob:
     def clampMutations(self):
         for key in self.dna:
             if not key in self.dnaClamp: continue
-            
+
             self.dna[key] = clamp(self.dna[key], self.dnaClamp[key][0], self.dnaClamp[key][1])
                 
             
@@ -77,9 +77,7 @@ class Blob:
 
     def mutate(self):
         dnaKeys = list(self.dna.keys())
-        i = 0
         for _ in range(random.choices([0,1,2,3,4,5,6],[20,15,30,15,10,5,5])[0]):
-            i += 1
             geneToMod = dnaKeys[random.randint(0,len(dnaKeys)-1)]
             if geneToMod == "maxSize":
                 self.dna[geneToMod] += random.randint(-int(self.dna[geneToMod]*self.MAX_MUTATION),int(self.dna[geneToMod]*self.MAX_MUTATION))
@@ -210,7 +208,6 @@ class Blob:
                         xFind.append(xSorted[i])
                     else:
                         break
-                # sleep(1)
                 break
             elif xSorted[x].pos[0] > self.pos[0]+self.size*2:
                 upper = x - 1
