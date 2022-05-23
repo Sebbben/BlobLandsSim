@@ -177,7 +177,7 @@ class Blob:
         for f in nearbyFoods:
             
             dist = self.distTo(f.pos)
-            if dist < closestdist and not f is self:    
+            if 0 < dist < closestdist and not f is self:    
                 closestdist = dist
                 closest = f
                 

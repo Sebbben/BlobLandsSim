@@ -1,5 +1,8 @@
 import pygame, sys, random, math, cProfile, pstats
 
+import pandas as pd
+import numpy as np
+
 from Blobs.carnivore import Carnivore
 from Blobs.herbivore import Herbivore
 from Blobs.parasite import Parasite
@@ -8,6 +11,7 @@ from food import Food
 from camera import Camera
 
 from settings import *
+from functions import *
 
 
 
@@ -18,13 +22,25 @@ class Game:
         self.SEE_TARGET_LINES = False
         self.lastBlobInfo = None
         self.paused = False
-        self.dataCollectionNumber = 0
-        self.data = []
+
+        self.dataIntervalTimer = 0
+        self.data = {
+            "numberOfBlobs":[],
+            "numberOfHerbivores":[],
+            "numberOfCarnivores":[],
+            "numberOfParasites":[],
+            "avrageSize":[],
+            "avrageSizeHerbivore":[],
+            "avrageSizeCarnivore":[],
+            "avrageSizeParasite":[],
+            "foodAmount":[],
+        }
 
         self.camMovingRight = False
         self.camMovingLeft = False
         self.camMovingUp = False
         self.camMovingDown = False
+
 
         pygame.init()
 
@@ -73,8 +89,9 @@ class Game:
             self.fpsClock.tick(FPS)
 
     def update(self):
+
+        self.dataIntervalTimer += 1
         
-        # if random.randint(1, round(FPS/20)) == 1:
         if random.randint(1, 2) == 1:
             f = Food(self.window)
             for i in range(len(self.foods)):
@@ -97,6 +114,11 @@ class Game:
         self.checkIfRottenFood()
         self.checkIfEaten()
 
+
+        if self.dataIntervalTimer > DATA_COLLECTION_FRAME_INTERVAL:
+            self.dataIntervalTimer = 0
+            self.collectData()
+
         
     def draw(self):
 
@@ -113,6 +135,44 @@ class Game:
             self.window.blit(text,textPos)
 
         self.cam.update()
+
+    def collectData(self):
+        numberOfBlobs = len(self.blobs)
+        numberOfHerbivores = 0
+        numberOfCarnivores = 0
+        numberOfParasites = 0
+        avrageSize = []
+        avrageSizeHerbivore = []
+        avrageSizeCarnivore = []
+        avrageSizeParasite = []
+        foodAmount = len(self.foods)
+
+        for blob in self.blobs:
+            avrageSize.append(blob.size)
+            if blob.dna["type"] == "Herbivore":
+                numberOfHerbivores += 1
+                avrageSizeHerbivore.append(blob.size)
+            elif blob.dna["type"] == "Carnivore":
+                numberOfCarnivores += 1
+                avrageSizeCarnivore.append(blob.size)
+            elif blob.dna["type"] == "Parasite":
+                numberOfParasites += 1
+                avrageSizeParasite.append(blob.size)
+        
+        avrageSize = avrg(avrageSize)
+        avrageSizeHerbivore = avrg(avrageSizeHerbivore)
+        avrageSizeCarnivore = avrg(avrageSizeCarnivore)
+        avrageSizeParasite = avrg(avrageSizeParasite)
+
+        self.data["numberOfBlobs"].append(numberOfBlobs)
+        self.data["numberOfHerbivores"].append(numberOfHerbivores)
+        self.data["numberOfCarnivores"].append(numberOfCarnivores)
+        self.data["numberOfParasites"].append(numberOfParasites)
+        self.data["avrageSize"].append(avrageSize)
+        self.data["avrageSizeHerbivore"].append(avrageSizeHerbivore)
+        self.data["avrageSizeCarnivore"].append(avrageSizeCarnivore)
+        self.data["avrageSizeParasite"].append(avrageSizeParasite)
+        self.data["foodAmount"].append(foodAmount)
 
     def populateLists(self):
         for _ in range(FOOD_AMOUNT//2):
@@ -243,6 +303,9 @@ class Game:
         self.cam.moveTarget(camMoveX, camMoveY)
 
     def quitGame(self):
+
+        pd.DataFrame(self.data).to_csv("blobData.csv")
+
         pygame.quit()
         sys.exit()
 

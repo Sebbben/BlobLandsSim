@@ -18,7 +18,7 @@ WINDOW_RES = (1080,720)
 
 # data collection settings
 
-DATA_COLLECTION_TIME_INTERVAL = 1
+DATA_COLLECTION_FRAME_INTERVAL = FPS*5
 
 
 # ---------- general blob settings ---------
