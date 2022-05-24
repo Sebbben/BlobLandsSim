@@ -1,7 +1,6 @@
 import pygame, sys, random, math, cProfile, pstats
 
 import pandas as pd
-import numpy as np
 
 from Blobs.carnivore import Carnivore
 from Blobs.herbivore import Herbivore
@@ -92,12 +91,13 @@ class Game:
 
         self.dataIntervalTimer += 1
         
-        if random.randint(1, 2) == 1:
-            f = Food(self.window)
-            for i in range(len(self.foods)):
-                if self.foods[i].pos[0] > f.pos[0]:
-                    self.foods.insert(i, f)
-                    break        
+        for i in range(NEW_FOOD_PER_FRAME):
+            if random.randint(1, 2) == 1:
+                f = Food(self.window)
+                for i in range(len(self.foods)):
+                    if self.foods[i].pos[0] > f.pos[0]:
+                        self.foods.insert(i, f)
+                        break        
 
         for food in self.foods:
             food.update()
