@@ -105,7 +105,7 @@ class Blob:
         if drawLines:
             pygame.draw.line(self.window, color, camera.getScreenPos(self.pos), camera.getScreenPos(self.target), width=max(round(2*camera.zoomLvl), 1))
 
-        pygame.draw.circle(self.window, color, camera.getScreenPos(self.pos), round(self.size*camera.zoomLvl))
+        pygame.draw.circle(self.window, color, camera.getScreenPos(self.pos), max(round(self.size*camera.zoomLvl), 1))
         
     def distTo(self, otherPos):
         return dist(otherPos,self.pos)
