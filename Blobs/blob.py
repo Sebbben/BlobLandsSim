@@ -1,5 +1,6 @@
 from abc import abstractclassmethod
 from math import ceil, dist
+from msilib.schema import Error
 import pygame
 import random
 
@@ -25,12 +26,18 @@ class Blob:
         self.eatCooldown = self.size*3
         
         self.SIMULATION_SIZE = SIMULATION_SIZE
+        
+        self.splitSizeFactor = 1
+        
+        self.seeTime = 0
+        self.isSeeer = True
 
         self.dnaClamp = {
             "maxSize":[30, 160],
             "minSize": [15,50],
             "seeRange": [0, 20],
             "seeChance": [0, 1],
+            "seeTime": [0, 100*FPS],
             "speed": [0, 100]
         }
 
@@ -41,6 +48,7 @@ class Blob:
             "type":"Herbivore",
             "seeRange":5,
             "seeChance":0.5,
+            "seeTime": 5*FPS,
             "rgb":[0, 0, 0],
             "speed":50
         } | dna
@@ -75,7 +83,7 @@ class Blob:
 
     def mutate(self):
         dnaKeys = list(self.dna.keys())
-        for _ in range(random.choices([0,1,2,3,4,5,6],[20,15,30,15,10,5,5])[0]):
+        for _ in range(random.choices([0,1,2,3,4,5,6],[15,15,30,20,10,5,5])[0]):
             geneToMod = dnaKeys[random.randint(0,len(dnaKeys)-1)]
             if geneToMod == "maxSize":
                 self.dna[geneToMod] += random.randint(-int(self.dna[geneToMod]*self.MAX_MUTATION),int(self.dna[geneToMod]*self.MAX_MUTATION))
@@ -87,6 +95,8 @@ class Blob:
                 self.dna[geneToMod] += random.uniform(-0.5, 0.5)
             elif geneToMod == "seeChance":
                 self.dna[geneToMod] += random.uniform(-0.2, 0.2)
+            elif geneToMod == "seeTime":
+                self.dna[geneToMod] += random.uniform(-5, 5)
             elif geneToMod == "rgb":
                 for __ in range(random.randint(1, 4)):
                     self.dna[geneToMod][random.randint(0, 2)] += random.randint(-10, 10)
@@ -111,7 +121,7 @@ class Blob:
         return dist(otherPos,self.pos)
 
     def readyToSplitt(self) -> bool:
-        return self.size > self.dna["maxSize"]
+        return self.size > self.dna["maxSize"] * self.splitSizeFactor
 
 
     def makeMoveVector(self, x, y, steps):
@@ -145,13 +155,25 @@ class Blob:
 
     def updateTarget(self):
         if self.target == None or self.distTo(self.target) < self.size - self.speed * self.gamespeed:
-            self.setTarget(self.newRandomTarget())            
+            self.setTarget(self.newRandomTarget()) 
+           
 
         
 
-    @abstractclassmethod
-    def move():
-        pass
+    #def move(self, food):
+    def move(self):
+        raise Exception("Her må du fixe blobtifine greier")
+        if random.randint(1, 100) < self.dna["seeChance"]:
+            self.seeTime = self.dna["seeTime"]
+        if self.seeTime > 0 and self.isSeeer:
+            self.see(food)
+            self.size -= self.energyConsumption*(self.dna["speed"]/50)
+            self.seeTime -= 1
+        else:
+            self.updateTarget()
+
+        self.pos[0] += self.xMove * self.gamespeed
+        self.pos[1] += self.yMove * self.gamespeed
 
     def update(self, blobs, foods, gamespeed, FPS):
         self.gamespeed = gamespeed

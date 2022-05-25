@@ -12,21 +12,17 @@ class Carnivore(Blob):
         self.eatCooldown = self.size * 3
         self.eatEfficiency = 1
         self.isSeeFrame = False
-        self.seeTime = 0
 
 
     def move(self):
-        if (self.seeTime <= 0):
-            self.updateTarget()
-
-
-        self.pos[0] += self.xMove * self.gamespeed
-        self.pos[1] += self.yMove * self.gamespeed
+        super().move()
     
     def getNewTarget(self):
         super().getNewTarget()
+        """
         if (ri(1, 100) < 100*self.dna["seeChance"]):
             self.seeTime = 5
+        """
             
 
     def eat(self, blobs):
@@ -38,13 +34,14 @@ class Carnivore(Blob):
                     self.eatCooldown = b.size*(FPS*0.5)
                     self.size = sqrt(self.size**2 + b.size**2).real
                     b.dead = True
-                    self.seeTime = 0
-                    
+                    #self.seeTime = 0
+        """          
         if self.seeTime >= 0: 
             self.seeTime -= 0.1*self.gamespeed
             self.see(blobs)
             self.size -= self.energyConsumption*self.gamespeed*(self.dna["speed"]/50)
             self.makeMoveVector(self.target[0], self.target[1], self.speed * self.gamespeed * (self.dna["speed"]/50))
+        """
                     
 
             

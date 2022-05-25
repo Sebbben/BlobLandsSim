@@ -13,10 +13,7 @@ class Herbivore(Blob):
         self.energyConsumption = HERBIVORE_ENERGY_CONSUMPTION
 
     def move(self):
-        self.updateTarget()
-
-        self.pos[0] += self.xMove * self.gamespeed
-        self.pos[1] += self.yMove * self.gamespeed
+        super().move()
 
     def getNewTarget(self):
         super().getNewTarget()
@@ -37,9 +34,12 @@ class Herbivore(Blob):
         foods.extend(newFoods)
             
 
+        """
         if self.isSeeFrame: 
             self.see(foods)
             self.size -= self.energyConsumption*(self.dna["speed"]/50)*5
             self.isSeeFrame = False
+        """            
+        
             
         self.makeMoveVector(self.target[0], self.target[1], self.speed * self.gamespeed)

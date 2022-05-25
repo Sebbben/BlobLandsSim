@@ -25,6 +25,9 @@ class Parasite(Blob):
 
         self.hostlessTimerResetTime = 2400
         self.hostlessTimer = self.hostlessTimerResetTime
+        
+        self.splitSizeFactor = 0.5
+        self.isSeeer = False
 
     def update(self, blobs, food, gamespeed, FPS):
         super().update(blobs, food, gamespeed, FPS)
@@ -66,10 +69,7 @@ class Parasite(Blob):
             self.pos = self.host.pos.copy()
             self.target = self.host.pos.copy()
         else:
-            self.updateTarget()
-
-            self.pos[0] += self.xMove * self.gamespeed
-            self.pos[1] += self.yMove * self.gamespeed
+            super().move()
 
     def eat(self):
         if self.host: # and isinstance(self.host, Carnivore):
