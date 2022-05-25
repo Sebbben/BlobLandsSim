@@ -1,4 +1,3 @@
-from random import randint as ri 
 from math import sqrt
 from Blobs.blob import Blob
 from settings import *
@@ -36,13 +35,11 @@ class Carnivore(Blob):
                     self.size = sqrt(self.size**2 + b.size**2).real
                     b.dead = True
                     #self.seeTime = 0
-        """          
-        if self.seeTime >= 0: 
-            self.seeTime -= 0.1*self.gamespeed
-            self.see(blobs)
-            self.size -= self.energyConsumption*self.gamespeed*(self.dna["speed"]/50)
-            self.makeMoveVector(self.target[0], self.target[1], self.speed * self.gamespeed * (self.dna["speed"]/50))
-        """
+   
+    def update(self, blobs, foods, gamespeed):
+        super().update(blobs,foods,gamespeed)
+
+        self.eat(blobs)
                     
 
             

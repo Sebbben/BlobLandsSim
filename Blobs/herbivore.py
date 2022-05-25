@@ -21,7 +21,7 @@ class Herbivore(Blob):
 
     def eat(self, foods:list):
 
-        close = self.getClose(foods)
+        close = self.getClose(foods, self.size*2)
 
         newFoods = foods.copy()        
 
@@ -33,13 +33,7 @@ class Herbivore(Blob):
         foods.clear()
         foods.extend(newFoods)
             
+    def update(self, blobs, foods, gamespeed):
+        super().update(blobs,foods,gamespeed)
 
-        """
-        if self.isSeeFrame: 
-            self.see(foods)
-            self.size -= self.energyConsumption*(self.dna["speed"]/50)*5
-            self.isSeeFrame = False
-        """            
-        
-            
-        self.makeMoveVector(self.target[0], self.target[1], self.speed * self.gamespeed)
+        self.eat(foods)

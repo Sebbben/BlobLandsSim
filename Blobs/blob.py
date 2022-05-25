@@ -1,6 +1,5 @@
 from abc import abstractclassmethod
 from math import ceil, dist
-from msilib.schema import Error
 import pygame
 import random
 
@@ -30,14 +29,13 @@ class Blob:
         self.splitSizeFactor = 1
         
         self.seeTime = 0
-        self.isSeeer = True
 
         self.dnaClamp = {
             "maxSize":[30, 160],
             "minSize": [15,50],
-            "seeRange": [0, 20],
+            "seeRange": [0, 200],
             "seeChance": [0, 1],
-            "seeTime": [0, 100*FPS],
+            "seeTime": [0, 10*FPS],
             "speed": [0, 100]
         }
 
@@ -46,8 +44,8 @@ class Blob:
             "maxSize": 80,
             "minSize": 20,
             "type":"Herbivore",
-            "seeRange":5,
-            "seeChance":0.5,
+            "seeRange":100,
+            "seeChance":1/(30*FPS),
             "seeTime": 5*FPS,
             "rgb":[0, 0, 0],
             "speed":50
@@ -96,7 +94,7 @@ class Blob:
             elif geneToMod == "seeChance":
                 self.dna[geneToMod] += random.uniform(-0.2, 0.2)
             elif geneToMod == "seeTime":
-                self.dna[geneToMod] += random.uniform(-5, 5)
+                self.dna[geneToMod] += random.randint(-5, 5)
             elif geneToMod == "rgb":
                 for __ in range(random.randint(1, 4)):
                     self.dna[geneToMod][random.randint(0, 2)] += random.randint(-10, 10)
@@ -135,7 +133,7 @@ class Blob:
         self.xMove = round(xOff*factor,2)
         self.yMove = round(yOff*factor,2)
         
-
+    
 
     def checkIfTooSmall(self):
         if self.size < self.MIN_BLOB_SIZE:
@@ -160,33 +158,45 @@ class Blob:
 
         
 
-    #def move(self, food):
     def move(self):
-        raise Exception("Her må du fixe blobtifine greier")
-        if random.randint(1, 100) < self.dna["seeChance"]:
-            self.seeTime = self.dna["seeTime"]
-        if self.seeTime > 0 and self.isSeeer:
-            self.see(food)
-            self.size -= self.energyConsumption*(self.dna["speed"]/50)
-            self.seeTime -= 1
-        else:
-            self.updateTarget()
-
         self.pos[0] += self.xMove * self.gamespeed
         self.pos[1] += self.yMove * self.gamespeed
 
-    def update(self, blobs, foods, gamespeed, FPS):
+    def update(self, blobs, foods, gamespeed):
         self.gamespeed = gamespeed
         self.size -= self.energyConsumption*self.gamespeed*(self.dna["speed"]/50)
         self.eatCooldown = max(-1, self.eatCooldown-1)
-        self.FPS = FPS
+
+        self.startSee()
+
+        if self.seeTime > 0:
+            target = self.findNearbyTarget(self.getClose(foods, self.dna["seeRange"]))
+            if target:
+                self.setTarget(target.pos)
+            else:
+                self.updateTarget()
+
+        else:
+            self.updateTarget()
 
         self.move()
 
         self.checkIfTooSmall()
         self.checkIfTooLarge(blobs)
         
-    def see(self, nearbyFoods):
+
+    def startSee(self):
+        if random.randint(1, 100) < self.dna["seeChance"]*100:
+            self.seeTime = self.dna["seeTime"]
+
+
+    def findNearbyTarget(self, nearbyFoods):
+    
+        if not nearbyFoods: return
+
+        self.size -= self.energyConsumption*(self.dna["speed"]/50)
+        self.seeTime = max(-1, self.seeTime-1)
+
 
         closest = None
         if not nearbyFoods[0] is self:        
@@ -197,17 +207,16 @@ class Blob:
         closestdist = self.distTo(closest.pos)
 
         for f in nearbyFoods:
-            
             dist = self.distTo(f.pos)
             if 0 < dist < closestdist and not f is self:    
                 closestdist = dist
                 closest = f
-                
+
         if closestdist < self.dna["seeRange"]:
-            self.setTarget(closest.pos)
+            return closest
 
             
-    def getClose(self, xSorted):
+    def getClose(self, xSorted, rng):
 
         upper = len(xSorted)
         lower = 0
@@ -217,19 +226,19 @@ class Blob:
 
         while upper > lower:
             x = mid()
-            if self.pos[0]-self.size*2 < xSorted[x].pos[0] < self.pos[0]+self.size*2 and xSorted[x] != self:
+            if self.pos[0]-rng < xSorted[x].pos[0] < self.pos[0]+rng and xSorted[x] != self:
                 for i in range(x, upper):
-                    if xSorted[i].pos[0] < self.pos[0]+self.size*2:
+                    if xSorted[i].pos[0] < self.pos[0]+rng:
                         xFind.append(xSorted[i])
                     else:
                         break
                 for i in range(x-1, lower, -1):
-                    if self.pos[0]-self.size*2 < xSorted[i].pos[0]:
+                    if self.pos[0]-rng < xSorted[i].pos[0]:
                         xFind.append(xSorted[i])
                     else:
                         break
                 break
-            elif xSorted[x].pos[0] > self.pos[0]+self.size*2:
+            elif xSorted[x].pos[0] > self.pos[0]+rng:
                 upper = x - 1
             else:
                 lower = x + 1

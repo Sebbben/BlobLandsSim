@@ -29,10 +29,12 @@ class Parasite(Blob):
         self.splitSizeFactor = 0.5
         self.isSeeer = False
 
-    def update(self, blobs, food, gamespeed, FPS):
-        super().update(blobs, food, gamespeed, FPS)
+    def update(self, blobs, food, gamespeed):
+        super().update(blobs, food, gamespeed)
         self.updateHost(blobs)
         self.updateHostTimer()
+
+        self.eat()
 
     def updateHostTimer(self):
         self.hostlessTimer -= 1

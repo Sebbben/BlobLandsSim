@@ -107,7 +107,7 @@ class Game:
             food.update()
         
         for blob in self.blobs:
-            blob.update(self.blobs,food,self.SPEED,FPS)
+            blob.update(self.blobs,self.foods,self.SPEED)
 
         if self.lastBlobInfo: 
             [posX,posY] = self.cam.getScreenPos(self.lastBlobInfo.pos)
@@ -116,7 +116,6 @@ class Game:
         self.blobs = [blob for blob in self.blobs if not blob.dead]
 
         self.checkIfRottenFood()
-        self.checkIfEaten()
 
 
         
@@ -130,7 +129,7 @@ class Game:
 
         if pygame.font and self.lastBlobInfo:
             f = pygame.font.Font(None, 32)
-            text = f.render(str(math.round(self.lastBlobInfo.size,2)) + str(math.round(self.lastBlobInfo.eatCooldown,2)) + "," + str(self.lastBlobInfo.dna),True, (0,0,0))
+            text = f.render(str(round(self.lastBlobInfo.size,2)) + str(round(self.lastBlobInfo.eatCooldown,2)) + "," + str(self.lastBlobInfo.dna),True, (0,0,0))
             textPos = text.get_rect(centerx=self.window.convert().get_width()/2, y=10)
             self.window.blit(text,textPos)
 
@@ -183,15 +182,7 @@ class Game:
         for _ in range(START_NUMBER_OF_BLOBS): self.blobs.append(Herbivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window))
 
         for _ in range(3): self.blobs.append(Carnivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window))
-            
-    def checkIfEaten(self):
-        for blob in self.blobs:
-            if isinstance(blob, Herbivore):
-                blob.eat(self.foods)
-            elif isinstance(blob, Carnivore):
-                blob.eat(self.blobs)
-            elif isinstance(blob, Parasite):
-                blob.eat()
+
                
     def checkIfRottenFood(self):
         self.foods = [food for food in self.foods if food.notRotten()]
@@ -205,7 +196,6 @@ class Game:
             if math.dist(self.cam.getScreenPos(blob.pos), mousePos) < blob.size * self.cam.zoomLvl:
                 self.lastBlobInfo = blob
                 self.cam.zoomTarget = 1
-
     def showStats(self):
         
         avrgVegiDna = {
