@@ -22,7 +22,8 @@ class Blob:
         self.target = None
         self.energyConsumption = 1/100
 
-        self.eatCooldown = self.size*3
+        #self.eatCooldown = self.size*3
+        self.eatCooldown = 0
         
         self.SIMULATION_SIZE = SIMULATION_SIZE
         
