@@ -48,7 +48,7 @@ class Parasite(Blob):
     def updateHost(self,blobs):
 
         if self.host: # skip trying to get new host if it allready has one
-            if self.host.size > self.size: # condition when parasite should leave host
+            if self.host.size < self.size: # condition when parasite should leave host
                 self.host = None
                 self.setTarget(self.newRandomTarget())
             else: # if has host and everythin is a ok
