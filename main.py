@@ -89,6 +89,10 @@ class Game:
 
     def update(self):
 
+        if self.dataIntervalTimer > DATA_COLLECTION_FRAME_INTERVAL:
+            self.dataIntervalTimer = 0
+            self.collectData()
+
         self.dataIntervalTimer += 1
         
         for i in range(NEW_FOOD_PER_FRAME):
@@ -115,10 +119,6 @@ class Game:
         self.checkIfEaten()
 
 
-        if self.dataIntervalTimer > DATA_COLLECTION_FRAME_INTERVAL:
-            self.dataIntervalTimer = 0
-            self.collectData()
-
         
     def draw(self):
 
@@ -130,7 +130,7 @@ class Game:
 
         if pygame.font and self.lastBlobInfo:
             f = pygame.font.Font(None, 32)
-            text = f.render(str(math.floor(self.lastBlobInfo.size*100)/100) + "," + str(self.lastBlobInfo.dna),True, (0,0,0))
+            text = f.render(str(math.round(self.lastBlobInfo.size,2)) + str(math.round(self.lastBlobInfo.eatCooldown,2)) + "," + str(self.lastBlobInfo.dna),True, (0,0,0))
             textPos = text.get_rect(centerx=self.window.convert().get_width()/2, y=10)
             self.window.blit(text,textPos)
 

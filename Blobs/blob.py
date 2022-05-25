@@ -82,7 +82,7 @@ class Blob:
             elif geneToMod == "minSize":
                 self.dna[geneToMod] = min(int(self.dna["maxSize"]//2), self.dna[geneToMod] + random.randint(-int(self.dna[geneToMod]*self.MAX_MUTATION),int(self.dna[geneToMod]*self.MAX_MUTATION)))
             elif geneToMod == "type":
-                self.dna[geneToMod] = random.choice(["Herbivore", "Carnivore", "Parasite"])
+                self.dna[geneToMod] = random.choice(["Herbivore", "Carnivore", "Parasite"]) if random.randint(1,20) == 1 else self.dna["type"]
             elif geneToMod == "seeRange":
                 self.dna[geneToMod] += random.uniform(-0.5, 0.5)
             elif geneToMod == "seeChance":
