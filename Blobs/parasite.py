@@ -27,7 +27,6 @@ class Parasite(Blob):
         self.hostlessTimer = self.hostlessTimerResetTime
         
         self.splitSizeFactor = 0.5
-        self.isSeeer = False
 
     def update(self, blobs, food, gamespeed):
         super().update(blobs, food, gamespeed)
@@ -37,6 +36,7 @@ class Parasite(Blob):
         self.eat()
 
     def updateHostTimer(self):
+        self.size -= PARASITE_HOSTLESS_ENERGY_CONSUMPTION_MILTUPLIER * (self.hostlessTimer/self.hostlessTimerResetTime) * self.energyConsumption
         self.hostlessTimer -= 1
         if self.hostlessTimer < 0:
             self.dead = True
@@ -55,6 +55,7 @@ class Parasite(Blob):
                 self.setTarget(self.newRandomTarget())
             else: # if has host and everythin is a ok
                 return
+
 
         for blob in blobs:
             if blob.dna["type"] == "Parasite": continue # skip if the other blob is parasite aka, don't be a canibal

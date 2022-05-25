@@ -51,6 +51,7 @@ class Blob:
             "speed":50
         } | dna
 
+        self.dna["rgb"] = self.dna["rgb"].copy()
 
         self.mutate()
 
@@ -88,7 +89,7 @@ class Blob:
             elif geneToMod == "minSize":
                 self.dna[geneToMod] = min(int(self.dna["maxSize"]//2), self.dna[geneToMod] + random.randint(-int(self.dna[geneToMod]*self.MAX_MUTATION),int(self.dna[geneToMod]*self.MAX_MUTATION)))
             elif geneToMod == "type":
-                self.dna[geneToMod] = random.choice(["Herbivore", "Carnivore", "Parasite"]) if random.randint(1,20) == 1 else self.dna["type"]
+                self.dna[geneToMod] = random.choice(["Herbivore", "Carnivore", "Parasite"]) if random.randint(1,5) == 1 else self.dna["type"]
             elif geneToMod == "seeRange":
                 self.dna[geneToMod] += random.uniform(-0.5, 0.5)
             elif geneToMod == "seeChance":
@@ -167,18 +168,7 @@ class Blob:
         self.size -= self.energyConsumption*self.gamespeed*(self.dna["speed"]/50)
         self.eatCooldown = max(-1, self.eatCooldown-1)
 
-        self.startSee()
-
-        if self.seeTime > 0:
-            target = self.findNearbyTarget(self.getClose(foods, self.dna["seeRange"]))
-            if target:
-                self.setTarget(target.pos)
-            else:
-                self.updateTarget()
-
-        else:
-            self.updateTarget()
-
+        self.updateTarget()
         self.move()
 
         self.checkIfTooSmall()

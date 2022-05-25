@@ -15,10 +15,6 @@ class Herbivore(Blob):
     def move(self):
         super().move()
 
-    def getNewTarget(self):
-        super().getNewTarget()
-        self.isSeeFrame = (random.randint(1, 100) < 100*self.dna["seeChance"]) 
-
     def eat(self, foods:list):
 
         close = self.getClose(foods, self.size*2)
@@ -35,5 +31,17 @@ class Herbivore(Blob):
             
     def update(self, blobs, foods, gamespeed):
         super().update(blobs,foods,gamespeed)
+
+        self.startSee()
+
+        if self.seeTime > 0:
+            target = self.findNearbyTarget(self.getClose(foods, self.dna["seeRange"]))
+            if target:
+                self.setTarget(target.pos)
+            else:
+                self.updateTarget()
+
+        else:
+            self.updateTarget()
 
         self.eat(foods)
