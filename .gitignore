@@ -3,3 +3,5 @@
 **.pyc
 __pycache__/blob.cpython-39.pyc
 __pycache__/food.cpython-39.pyc
+**.csv
+*.csv
