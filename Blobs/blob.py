@@ -9,6 +9,7 @@ from functions import clamp
 
 class Blob:
     def __init__(self, size:float, pos:list, window, dna = {}) -> None:
+        
         self.pos = pos
         self.size = size
 
@@ -30,6 +31,8 @@ class Blob:
         self.splitSizeFactor = 1
         
         self.seeTime = 0
+        
+        self.type = "blob"
 
         self.dnaClamp = {
             "maxSize":[30, 160],
@@ -54,8 +57,8 @@ class Blob:
 
         self.dna["rgb"] = self.dna["rgb"].copy()
 
-        self.mutate()
 
+        self.mutate()
         self.window = window
 
 
@@ -90,7 +93,7 @@ class Blob:
             elif geneToMod == "minSize":
                 self.dna[geneToMod] = min(int(self.dna["maxSize"]//2), self.dna[geneToMod] + random.randint(-int(self.dna[geneToMod]*self.MAX_MUTATION),int(self.dna[geneToMod]*self.MAX_MUTATION)))
             elif geneToMod == "type":
-                self.dna[geneToMod] = random.choice(["Herbivore", "Carnivore", "Parasite"]) if random.randint(1,5) == 1 else self.dna["type"]
+                self.dna[geneToMod] = random.choice(["Herbivore", "Carnivore", "Parasite"]) if random.randint(1,3) == 1 else self.dna["type"]
             elif geneToMod == "seeRange":
                 self.dna[geneToMod] += random.uniform(-0.5, 0.5)
             elif geneToMod == "seeChance":
@@ -168,6 +171,7 @@ class Blob:
         self.gamespeed = gamespeed
         self.size -= self.energyConsumption*self.gamespeed*(self.dna["speed"]/50)
         self.eatCooldown = max(-1, self.eatCooldown-1)
+        self.seeTime = max(-1, self.seeTime-1)
 
         self.updateTarget()
         self.move()
@@ -183,10 +187,10 @@ class Blob:
 
     def findNearbyTarget(self, nearbyFoods):
     
-        if not nearbyFoods: return
+        if len(nearbyFoods) == 0: return
 
         self.size -= self.energyConsumption*(self.dna["speed"]/50)
-        self.seeTime = max(-1, self.seeTime-1)
+        
 
 
         closest = None
@@ -199,7 +203,7 @@ class Blob:
 
         for f in nearbyFoods:
             dist = self.distTo(f.pos)
-            if 0 < dist < closestdist and not f is self:    
+            if 0 < dist < closestdist and not f is self and not f.type == "Carnivore" and not f.type == "Parasite" and not f.size > self.size*3:     
                 closestdist = dist
                 closest = f
 

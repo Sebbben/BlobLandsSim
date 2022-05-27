@@ -75,6 +75,7 @@ class Game:
                     self.handleKeyDown(event)
                 elif event.type == pygame.KEYUP:
                     self.handleKeyUp(event)
+                
 
             self.updateCam()
 
@@ -273,6 +274,11 @@ class Game:
             self.SEE_TARGET_LINES = not self.SEE_TARGET_LINES
         elif event.key == pygame.K_RETURN:
             self.cam.center()
+        elif event.key == pygame.K_o:
+            self.blobs.append(Carnivore(START_BLOB_SIZE*2,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window, dna={"type":"Carnivore","seeChance":1}))
+        elif event.key == pygame.K_i:
+            self.blobs.append(Herbivore(START_BLOB_SIZE*2,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window, dna={"type":"Herbivore"}))
+            
 
     def updateCam(self):
         keys = pygame.key.get_pressed()

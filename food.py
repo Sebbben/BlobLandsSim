@@ -5,6 +5,9 @@ from settings import *
 
 class Food:
     def __init__(self, window, age = 0) -> None:
+        
+        self.type = "food"
+        
         self.size = ri(5,10)
         self.color = FOOD_COLOR()
         self.maxAge = (30)*20  #  (FPS) * seconds
