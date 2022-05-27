@@ -37,10 +37,10 @@ class Blob:
         self.dnaClamp = {
             "maxSize":[30, 160],
             "minSize": [15,50],
-            "seeRange": [0, 200],
+            "seeRange": [0, 1000],
             "seeChance": [0, 1],
             "seeTime": [0, 10*FPS],
-            "speed": [0, 100]
+            "speed": [0, 100],
         }
 
     
@@ -48,11 +48,12 @@ class Blob:
             "maxSize": 80,
             "minSize": 20,
             "type":"Herbivore",
-            "seeRange":100,
+            "seeRange":300,
             "seeChance":1/(30*FPS),
             "seeTime": 5*FPS,
             "rgb":[0, 0, 0],
-            "speed":50
+            "speed":50,
+            "isCannibal":False
         } | dna
 
         self.dna["rgb"] = self.dna["rgb"].copy()
@@ -95,7 +96,7 @@ class Blob:
             elif geneToMod == "type":
                 self.dna[geneToMod] = random.choice(["Herbivore", "Carnivore", "Parasite"]) if random.randint(1,3) == 1 else self.dna["type"]
             elif geneToMod == "seeRange":
-                self.dna[geneToMod] += random.uniform(-0.5, 0.5)
+                self.dna[geneToMod] += random.randint(-50, 50)
             elif geneToMod == "seeChance":
                 self.dna[geneToMod] += random.uniform(-0.2, 0.2)
             elif geneToMod == "seeTime":
@@ -104,7 +105,9 @@ class Blob:
                 for __ in range(random.randint(1, 4)):
                     self.dna[geneToMod][random.randint(0, 2)] += random.randint(-10, 10)
             elif geneToMod == "speed":
-                self.dna[geneToMod] += random.randint(-10, 10)
+                self.dna[geneToMod] += random.randint(-15, 15)
+            elif geneToMod == "isCannibal":
+                self.dna[geneToMod] = not self.dna[geneToMod]
                 
         self.clampMutations()
 
@@ -144,10 +147,12 @@ class Blob:
         if self.size < self.MIN_BLOB_SIZE:
             self.dead = True
 
-    def checkIfTooLarge(self,blobs:list):
+    def checkIfTooLarge(self,blobs:list,stats):
         if self.readyToSplitt():
             self.dead = True
             blobs += self.split()
+            for key in stats:
+                stats[key].append(self.dna[key])
 
     def newRandomTarget(self):
         return [random.randint(0,self.SIMULATION_SIZE[0]-ceil(self.size)), random.randint(0, self.SIMULATION_SIZE[1]-ceil(self.size))]
@@ -167,7 +172,7 @@ class Blob:
         self.pos[0] += self.xMove * self.gamespeed
         self.pos[1] += self.yMove * self.gamespeed
 
-    def update(self, blobs, foods, gamespeed):
+    def update(self, blobs, foods, gamespeed, stats):
         self.gamespeed = gamespeed
         self.size -= self.energyConsumption*self.gamespeed*(self.dna["speed"]/50)
         self.eatCooldown = max(-1, self.eatCooldown-1)
@@ -177,12 +182,21 @@ class Blob:
         self.move()
 
         self.checkIfTooSmall()
-        self.checkIfTooLarge(blobs)
+        self.checkIfTooLarge(blobs, stats)
         
 
     def startSee(self):
         if random.randint(1, 100) < self.dna["seeChance"]*100:
             self.seeTime = self.dna["seeTime"]
+            
+    
+    
+    @abstractclassmethod
+    def canEat(blob):
+        pass
+    
+    def nearEnoughBlob(self, blob):
+        return self.distTo(blob.pos) < self.size+(blob.size/2)
 
 
     def findNearbyTarget(self, nearbyFoods):
@@ -203,7 +217,7 @@ class Blob:
 
         for f in nearbyFoods:
             dist = self.distTo(f.pos)
-            if 0 < dist < closestdist and not f is self and not f.type == "Carnivore" and not f.type == "Parasite" and not f.size > self.size*3:     
+            if 0 < dist < closestdist and self.canEat(f):     
                 closestdist = dist
                 closest = f
 

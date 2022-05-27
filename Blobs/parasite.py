@@ -30,8 +30,8 @@ class Parasite(Blob):
         
         self.splitSizeFactor = 0.5
 
-    def update(self, blobs, food, gamespeed):
-        super().update(blobs, food, gamespeed)
+    def update(self, blobs, food, gamespeed, stats):
+        super().update(blobs, food, gamespeed, stats)
         self.updateHost(blobs)
         self.updateHostTimer()
 
