@@ -9,7 +9,7 @@ class Carnivore(Blob):
         self.energyConsumption = CARNIVORE_ENERGY_CONSUMPTION
         self.color = CARNIVORE_COLOR
         #self.eatCooldown = self.size * 3
-        self.eatCooldown = 3*FPS
+        self.eatCooldown = 5*FPS
         self.eatEfficiency = 1
         self.isSeeFrame = False
         
@@ -28,7 +28,7 @@ class Carnivore(Blob):
         """
         
     def canEat(self, blob):
-        return ((blob.type == "Herbivore" or (self.dna["isCannibal"] and blob.type == "Carnivore")) and blob.size < self.size * 3)
+        return ((blob.type == "Herbivore" or (self.dna["isCannibal"] and blob.type == "Carnivore")) and blob.size < self.size * 3) and self.eatCooldown <= 0
 
     def eat(self, blobs):
         if self.eatCooldown > 0: return

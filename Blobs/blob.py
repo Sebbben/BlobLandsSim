@@ -50,7 +50,7 @@ class Blob:
             "type":"Herbivore",
             "seeRange":300,
             "seeChance":1/(30*FPS),
-            "seeTime": 5*FPS,
+            "seeTime": 2.5*FPS,
             "rgb":[0, 0, 0],
             "speed":50,
             "isCannibal":False
@@ -100,7 +100,7 @@ class Blob:
             elif geneToMod == "seeChance":
                 self.dna[geneToMod] += random.uniform(-0.2, 0.2)
             elif geneToMod == "seeTime":
-                self.dna[geneToMod] += random.randint(-5, 5)
+                self.dna[geneToMod] += random.randint(-50, 50)
             elif geneToMod == "rgb":
                 for __ in range(random.randint(1, 4)):
                     self.dna[geneToMod][random.randint(0, 2)] += random.randint(-10, 10)
@@ -186,7 +186,7 @@ class Blob:
         
 
     def startSee(self):
-        if random.randint(1, 100) < self.dna["seeChance"]*100:
+        if random.randint(1, 10000) < self.dna["seeChance"]*100 and self.eatCooldown <= 0:
             self.seeTime = self.dna["seeTime"]
             
     
