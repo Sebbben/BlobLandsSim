@@ -9,6 +9,7 @@ from functions import clamp
 
 class Blob:
     def __init__(self, size:float, pos:list, window, dna = {}) -> None:
+        
         self.pos = pos
         self.size = size
 
@@ -22,16 +23,24 @@ class Blob:
         self.target = None
         self.energyConsumption = 1/100
 
-        self.eatCooldown = self.size*3
+        #self.eatCooldown = self.size*3
+        self.eatCooldown = 0
         
         self.SIMULATION_SIZE = SIMULATION_SIZE
+        
+        self.splitSizeFactor = 1
+        
+        self.seeTime = 0
+        
+        self.type = "blob"
 
         self.dnaClamp = {
             "maxSize":[30, 160],
             "minSize": [15,50],
-            "seeRange": [0, 20],
+            "seeRange": [0, 1000],
             "seeChance": [0, 1],
-            "speed": [0, 100]
+            "seeTime": [0, 10*FPS],
+            "speed": [0, 100],
         }
 
     
@@ -39,15 +48,18 @@ class Blob:
             "maxSize": 80,
             "minSize": 20,
             "type":"Herbivore",
-            "seeRange":5,
-            "seeChance":0.5,
+            "seeRange":300,
+            "seeChance":1/(30*FPS),
+            "seeTime": 2.5*FPS,
             "rgb":[0, 0, 0],
-            "speed":50
+            "speed":50,
+            "isCannibal":False
         } | dna
+
+        self.dna["rgb"] = self.dna["rgb"].copy()
 
 
         self.mutate()
-
         self.window = window
 
 
@@ -75,23 +87,27 @@ class Blob:
 
     def mutate(self):
         dnaKeys = list(self.dna.keys())
-        for _ in range(random.choices([0,1,2,3,4,5,6],[20,15,30,15,10,5,5])[0]):
+        for _ in range(random.choices([0,1,2,3,4,5,6],[15,15,30,20,10,5,5])[0]):
             geneToMod = dnaKeys[random.randint(0,len(dnaKeys)-1)]
             if geneToMod == "maxSize":
                 self.dna[geneToMod] += random.randint(-int(self.dna[geneToMod]*self.MAX_MUTATION),int(self.dna[geneToMod]*self.MAX_MUTATION))
             elif geneToMod == "minSize":
                 self.dna[geneToMod] = min(int(self.dna["maxSize"]//2), self.dna[geneToMod] + random.randint(-int(self.dna[geneToMod]*self.MAX_MUTATION),int(self.dna[geneToMod]*self.MAX_MUTATION)))
             elif geneToMod == "type":
-                self.dna[geneToMod] = random.choice(["Herbivore", "Carnivore", "Parasite"])
+                self.dna[geneToMod] = random.choice(["Herbivore", "Carnivore", "Parasite"]) if random.randint(1,3) == 1 else self.dna["type"]
             elif geneToMod == "seeRange":
-                self.dna[geneToMod] += random.uniform(-0.5, 0.5)
+                self.dna[geneToMod] += random.randint(-50, 50)
             elif geneToMod == "seeChance":
                 self.dna[geneToMod] += random.uniform(-0.2, 0.2)
+            elif geneToMod == "seeTime":
+                self.dna[geneToMod] += random.randint(-50, 50)
             elif geneToMod == "rgb":
                 for __ in range(random.randint(1, 4)):
                     self.dna[geneToMod][random.randint(0, 2)] += random.randint(-10, 10)
             elif geneToMod == "speed":
-                self.dna[geneToMod] += random.randint(-10, 10)
+                self.dna[geneToMod] += random.randint(-15, 15)
+            elif geneToMod == "isCannibal":
+                self.dna[geneToMod] = not self.dna[geneToMod]
                 
         self.clampMutations()
 
@@ -105,13 +121,13 @@ class Blob:
         if drawLines:
             pygame.draw.line(self.window, color, camera.getScreenPos(self.pos), camera.getScreenPos(self.target), width=max(round(2*camera.zoomLvl), 1))
 
-        pygame.draw.circle(self.window, color, camera.getScreenPos(self.pos), round(self.size*camera.zoomLvl))
+        pygame.draw.circle(self.window, color, camera.getScreenPos(self.pos), max(round(self.size*camera.zoomLvl), 1))
         
     def distTo(self, otherPos):
         return dist(otherPos,self.pos)
 
     def readyToSplitt(self) -> bool:
-        return self.size > self.dna["maxSize"]
+        return self.size > self.dna["maxSize"] * self.splitSizeFactor
 
 
     def makeMoveVector(self, x, y, steps):
@@ -125,16 +141,18 @@ class Blob:
         self.xMove = round(xOff*factor,2)
         self.yMove = round(yOff*factor,2)
         
-
+    
 
     def checkIfTooSmall(self):
         if self.size < self.MIN_BLOB_SIZE:
             self.dead = True
 
-    def checkIfTooLarge(self,blobs:list):
+    def checkIfTooLarge(self,blobs:list,stats):
         if self.readyToSplitt():
             self.dead = True
             blobs += self.split()
+            for key in stats:
+                stats[key].append(self.dna[key])
 
     def newRandomTarget(self):
         return [random.randint(0,self.SIMULATION_SIZE[0]-ceil(self.size)), random.randint(0, self.SIMULATION_SIZE[1]-ceil(self.size))]
@@ -145,26 +163,49 @@ class Blob:
 
     def updateTarget(self):
         if self.target == None or self.distTo(self.target) < self.size - self.speed * self.gamespeed:
-            self.setTarget(self.newRandomTarget())            
+            self.setTarget(self.newRandomTarget()) 
+           
 
         
 
-    @abstractclassmethod
-    def move():
-        pass
+    def move(self):
+        self.pos[0] += self.xMove * self.gamespeed
+        self.pos[1] += self.yMove * self.gamespeed
 
-    def update(self, blobs, foods, gamespeed, FPS):
+    def update(self, blobs, foods, gamespeed, stats):
         self.gamespeed = gamespeed
         self.size -= self.energyConsumption*self.gamespeed*(self.dna["speed"]/50)
         self.eatCooldown = max(-1, self.eatCooldown-1)
-        self.FPS = FPS
+        self.seeTime = max(-1, self.seeTime-1)
 
+        self.updateTarget()
         self.move()
 
         self.checkIfTooSmall()
-        self.checkIfTooLarge(blobs)
+        self.checkIfTooLarge(blobs, stats)
         
-    def see(self, nearbyFoods):
+
+    def startSee(self):
+        if random.randint(1, 10000) < self.dna["seeChance"]*100 and self.eatCooldown <= 0:
+            self.seeTime = self.dna["seeTime"]
+            
+    
+    
+    @abstractclassmethod
+    def canEat(blob):
+        pass
+    
+    def nearEnoughBlob(self, blob):
+        return self.distTo(blob.pos) < self.size+(blob.size/2)
+
+
+    def findNearbyTarget(self, nearbyFoods):
+    
+        if len(nearbyFoods) == 0: return
+
+        self.size -= self.energyConsumption*(self.dna["speed"]/50)
+        
+
 
         closest = None
         if not nearbyFoods[0] is self:        
@@ -175,17 +216,16 @@ class Blob:
         closestdist = self.distTo(closest.pos)
 
         for f in nearbyFoods:
-            
             dist = self.distTo(f.pos)
-            if dist < closestdist and not f is self:    
+            if 0 < dist < closestdist and self.canEat(f):     
                 closestdist = dist
                 closest = f
-                
+
         if closestdist < self.dna["seeRange"]:
-            self.setTarget(closest.pos)
+            return closest
 
             
-    def getClose(self, xSorted):
+    def getClose(self, xSorted, rng):
 
         upper = len(xSorted)
         lower = 0
@@ -195,19 +235,19 @@ class Blob:
 
         while upper > lower:
             x = mid()
-            if self.pos[0]-self.size*2 < xSorted[x].pos[0] < self.pos[0]+self.size*2 and xSorted[x] != self:
+            if self.pos[0]-rng < xSorted[x].pos[0] < self.pos[0]+rng and xSorted[x] != self:
                 for i in range(x, upper):
-                    if xSorted[i].pos[0] < self.pos[0]+self.size*2:
+                    if xSorted[i].pos[0] < self.pos[0]+rng:
                         xFind.append(xSorted[i])
                     else:
                         break
                 for i in range(x-1, lower, -1):
-                    if self.pos[0]-self.size*2 < xSorted[i].pos[0]:
+                    if self.pos[0]-rng < xSorted[i].pos[0]:
                         xFind.append(xSorted[i])
                     else:
                         break
                 break
-            elif xSorted[x].pos[0] > self.pos[0]+self.size*2:
+            elif xSorted[x].pos[0] > self.pos[0]+rng:
                 upper = x - 1
             else:
                 lower = x + 1

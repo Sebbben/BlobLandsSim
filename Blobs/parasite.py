@@ -5,7 +5,7 @@ from settings import *
 
 class Parasite(Blob):
     def __init__(self, size:float, pos:list, window, dna = {}):
-
+        
         if not dna:
             self.dna["maxSize"] = 20
             super().__init__(size, pos, window, {"maxSize":20})
@@ -15,6 +15,8 @@ class Parasite(Blob):
 
 
         self.dnaClamp["maxSize"] = [5,30]
+        
+        self.type = "Parasite"
 
 
         self.color = PARASITE_COLOR
@@ -25,13 +27,18 @@ class Parasite(Blob):
 
         self.hostlessTimerResetTime = 2400
         self.hostlessTimer = self.hostlessTimerResetTime
+        
+        self.splitSizeFactor = 0.5
 
-    def update(self, blobs, food, gamespeed, FPS):
-        super().update(blobs, food, gamespeed, FPS)
+    def update(self, blobs, food, gamespeed, stats):
+        super().update(blobs, food, gamespeed, stats)
         self.updateHost(blobs)
         self.updateHostTimer()
 
+        self.eat()
+
     def updateHostTimer(self):
+        self.size -= PARASITE_HOSTLESS_ENERGY_CONSUMPTION_MILTUPLIER * (self.hostlessTimer/self.hostlessTimerResetTime) * self.energyConsumption
         self.hostlessTimer -= 1
         if self.hostlessTimer < 0:
             self.dead = True
@@ -45,11 +52,12 @@ class Parasite(Blob):
     def updateHost(self,blobs):
 
         if self.host: # skip trying to get new host if it allready has one
-            if self.host.size > self.size: # condition when parasite should leave host
+            if self.host.size < self.size: # condition when parasite should leave host
                 self.host = None
                 self.setTarget(self.newRandomTarget())
             else: # if has host and everythin is a ok
                 return
+
 
         for blob in blobs:
             if blob.dna["type"] == "Parasite": continue # skip if the other blob is parasite aka, don't be a canibal
@@ -66,10 +74,7 @@ class Parasite(Blob):
             self.pos = self.host.pos.copy()
             self.target = self.host.pos.copy()
         else:
-            self.updateTarget()
-
-            self.pos[0] += self.xMove * self.gamespeed
-            self.pos[1] += self.yMove * self.gamespeed
+            super().move()
 
     def eat(self):
         if self.host: # and isinstance(self.host, Carnivore):

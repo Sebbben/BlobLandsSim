@@ -11,20 +11,19 @@ class Herbivore(Blob):
         self.isSeeFrame = False
         self.color = HERBIVORE_COLOR
         self.energyConsumption = HERBIVORE_ENERGY_CONSUMPTION
+        
+        self.type = "Herbivore"
 
     def move(self):
-        self.updateTarget()
-
-        self.pos[0] += self.xMove * self.gamespeed
-        self.pos[1] += self.yMove * self.gamespeed
-
-    def getNewTarget(self):
-        super().getNewTarget()
-        self.isSeeFrame = (random.randint(1, 100) < 100*self.dna["seeChance"]) 
+        super().move() #hvorfor trengs ikke self som en parameter her?
+        
+    def canEat(self, blob):
+        return True
+        
 
     def eat(self, foods:list):
 
-        close = self.getClose(foods)
+        close = self.getClose(foods, self.size*2)
 
         newFoods = foods.copy()        
 
@@ -36,10 +35,19 @@ class Herbivore(Blob):
         foods.clear()
         foods.extend(newFoods)
             
+    def update(self, blobs, foods, gamespeed, stats):
+        super().update(blobs,foods,gamespeed, stats)
 
-        if self.isSeeFrame: 
-            self.see(foods)
-            self.size -= self.energyConsumption*(self.dna["speed"]/50)*5
-            self.isSeeFrame = False
-            
-        self.makeMoveVector(self.target[0], self.target[1], self.speed * self.gamespeed)
+        self.startSee()
+
+        if self.seeTime > 0:
+            target = self.findNearbyTarget(self.getClose(foods, self.dna["seeRange"]))
+            if target:
+                self.setTarget(target.pos)
+            else:
+                self.updateTarget()
+
+        else:
+            self.updateTarget()
+
+        self.eat(foods)
