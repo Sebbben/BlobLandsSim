@@ -3,8 +3,8 @@ from Blobs.blob import Blob
 from settings import *
 
 class Carnivore(Blob):
-    def __init__(self, size:float, pos:list, window, dna = {}):
-        super().__init__(size, pos, window, dna)
+    def __init__(self, size:float, pos:list, window, infant):
+        super().__init__(size, pos, window, infant)
 
         self.energyConsumption = CARNIVORE_ENERGY_CONSUMPTION
         self.color = CARNIVORE_COLOR

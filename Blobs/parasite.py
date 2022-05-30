@@ -4,13 +4,9 @@ from math import sqrt, pi
 from settings import *
 
 class Parasite(Blob):
-    def __init__(self, size:float, pos:list, window, dna = {}):
+    def __init__(self, size:float, pos:list, window, infant):
         
-        if not dna:
-            self.dna["maxSize"] = 20
-            super().__init__(size, pos, window, {"maxSize":20})
-        else:
-            super().__init__(size, pos, window, dna)
+        super().__init__(size, pos, window, infant)
 
 
 

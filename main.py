@@ -1,6 +1,8 @@
 import pygame, sys, random, math, cProfile, pstats
 
 import pandas as pd
+from Blobs.blobFactory import BlobFactory
+from Blobs.blobInfant import BlobInfant
 
 from Blobs.carnivore import Carnivore
 from Blobs.herbivore import Herbivore
@@ -206,7 +208,9 @@ class Game:
 
         self.foods.sort(key=lambda f:f.pos[0])
 
-        for _ in range(START_NUMBER_OF_BLOBS): self.blobs.append(Herbivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window))
+        for _ in range(START_NUMBER_OF_BLOBS): 
+            infant = BlobInfant()
+            self.blobs.append(BlobFactory.createBlob(START_BLOB_SIZE, [random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])],self.window,infant))
 
         #for _ in range(3): self.blobs.append(Carnivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window, dna={"type":"Carnivore"}))
 
