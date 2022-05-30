@@ -34,11 +34,34 @@ class Game:
             "avrageSizeParasite":[],
             "foodAmount":[],
         }
+        
+        self.data = {
+            "splitDna":[]
+        }
 
         self.camMovingRight = False
         self.camMovingLeft = False
         self.camMovingUp = False
         self.camMovingDown = False
+        
+        
+        self.defaultDna = {
+            "maxSize": 80,
+            "minSize": 20,
+            "type":"Herbivore",
+            "seeRange":300,
+            "seeChance":1/(30*FPS),
+            "seeTime": 5*FPS,
+            "rgb":[0, 0, 0],
+            "speed":50,
+            "isCannibal":5
+        }
+        
+        
+        self.splitDnaList = {}
+        
+        for key in self.defaultDna.keys():
+            self.splitDnaList[key] = []
 
 
         pygame.init()
@@ -75,6 +98,7 @@ class Game:
                     self.handleKeyDown(event)
                 elif event.type == pygame.KEYUP:
                     self.handleKeyUp(event)
+                
 
             self.updateCam()
 
@@ -107,7 +131,7 @@ class Game:
             food.update()
         
         for blob in self.blobs:
-            blob.update(self.blobs,self.foods,self.SPEED)
+            blob.update(self.blobs,self.foods,self.SPEED,self.splitDnaList)
 
         if self.lastBlobInfo: 
             [posX,posY] = self.cam.getScreenPos(self.lastBlobInfo.pos)
@@ -128,7 +152,7 @@ class Game:
             blob.draw(self.cam, self.SEE_TARGET_LINES)
 
         if pygame.font and self.lastBlobInfo:
-            f = pygame.font.Font(None, 32)
+            f = pygame.font.Font(None, 25)
             text = f.render(str(round(self.lastBlobInfo.size,2)) + str(round(self.lastBlobInfo.eatCooldown,2)) + "," + str(self.lastBlobInfo.dna),True, (0,0,0))
             textPos = text.get_rect(centerx=self.window.convert().get_width()/2, y=10)
             self.window.blit(text,textPos)
@@ -163,6 +187,7 @@ class Game:
         avrageSizeCarnivore = avrg(avrageSizeCarnivore)
         avrageSizeParasite = avrg(avrageSizeParasite)
 
+        """  
         self.data["numberOfBlobs"].append(numberOfBlobs)
         self.data["numberOfHerbivores"].append(numberOfHerbivores)
         self.data["numberOfCarnivores"].append(numberOfCarnivores)
@@ -172,6 +197,8 @@ class Game:
         self.data["avrageSizeCarnivore"].append(avrageSizeCarnivore)
         self.data["avrageSizeParasite"].append(avrageSizeParasite)
         self.data["foodAmount"].append(foodAmount)
+        """
+        #self.data["splitDna"].append(self.splitDnaList)
 
     def populateLists(self):
         for _ in range(FOOD_AMOUNT//2):
@@ -181,7 +208,7 @@ class Game:
 
         for _ in range(START_NUMBER_OF_BLOBS): self.blobs.append(Herbivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window))
 
-        for _ in range(3): self.blobs.append(Carnivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window))
+        #for _ in range(3): self.blobs.append(Carnivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window, dna={"type":"Carnivore"}))
 
                
     def checkIfRottenFood(self):
@@ -273,6 +300,11 @@ class Game:
             self.SEE_TARGET_LINES = not self.SEE_TARGET_LINES
         elif event.key == pygame.K_RETURN:
             self.cam.center()
+        elif event.key == pygame.K_o:
+            self.blobs.append(Carnivore(START_BLOB_SIZE*2,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window, dna={"type":"Carnivore","seeChance":1}))
+        elif event.key == pygame.K_i:
+            self.blobs.append(Herbivore(START_BLOB_SIZE*2,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window, dna={"type":"Herbivore"}))
+            
 
     def updateCam(self):
         keys = pygame.key.get_pressed()
@@ -283,8 +315,8 @@ class Game:
         camMovingDown = keys[pygame.K_s]
 
         
-        camMoveX = (camMovingRight-camMovingLeft) * CAMERA_SPEED
-        camMoveY = (camMovingDown-camMovingUp) * CAMERA_SPEED
+        camMoveX = (camMovingRight-camMovingLeft) * CAMERA_SPEED 
+        camMoveY = (camMovingDown-camMovingUp) * CAMERA_SPEED 
 
         mouseMovement = pygame.mouse.get_rel() # needs to get called every frame to get accurate readings
         if pygame.mouse.get_pressed()[0]:
@@ -293,8 +325,9 @@ class Game:
         self.cam.moveTarget(camMoveX, camMoveY)
 
     def quitGame(self):
-
-        pd.DataFrame(self.data).to_csv("blobData.csv")
+        
+        #pd.DataFrame(self.data).to_csv("blobData.csv")
+        pd.DataFrame(self.splitDnaList).to_csv("blobData.csv")
 
         pygame.quit()
         sys.exit()

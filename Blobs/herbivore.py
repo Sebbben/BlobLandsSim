@@ -11,9 +11,15 @@ class Herbivore(Blob):
         self.isSeeFrame = False
         self.color = HERBIVORE_COLOR
         self.energyConsumption = HERBIVORE_ENERGY_CONSUMPTION
+        
+        self.type = "Herbivore"
 
     def move(self):
-        super().move()
+        super().move() #hvorfor trengs ikke self som en parameter her?
+        
+    def canEat(self, blob):
+        return True
+        
 
     def eat(self, foods:list):
 
@@ -29,8 +35,8 @@ class Herbivore(Blob):
         foods.clear()
         foods.extend(newFoods)
             
-    def update(self, blobs, foods, gamespeed):
-        super().update(blobs,foods,gamespeed)
+    def update(self, blobs, foods, gamespeed, stats):
+        super().update(blobs,foods,gamespeed, stats)
 
         self.startSee()
 
