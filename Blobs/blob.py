@@ -1,4 +1,3 @@
-from abc import abstractclassmethod
 from math import ceil, dist
 import pygame
 import random
@@ -181,23 +180,23 @@ class Blob:
             self.seeTime = self.dna["seeTime"]
 
 
-    def findNearbyTarget(self, nearbyFoods):
+    def findNearbyTarget(self, targets):
     
-        if not nearbyFoods: return
+        if not targets: return
 
         self.size -= self.energyConsumption*(self.dna["speed"]/50)
         self.seeTime = max(-1, self.seeTime-1)
 
 
         closest = None
-        if not nearbyFoods[0] is self:        
-            closest = nearbyFoods[0]
+        if not targets[0] is self:        
+            closest = targets[0]
         else:
-            closest = nearbyFoods[1]
+            closest = targets[1]    
 
         closestdist = self.distTo(closest.pos)
 
-        for f in nearbyFoods:
+        for f in targets:
             dist = self.distTo(f.pos)
             if 0 < dist < closestdist and not f is self:    
                 closestdist = dist
