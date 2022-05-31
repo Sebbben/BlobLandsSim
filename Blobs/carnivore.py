@@ -28,7 +28,7 @@ class Carnivore(Blob):
         """
         
     def canEat(self, blob):
-        return ((blob.type == "Herbivore" or (self.dna["isCannibal"] and blob.type == "Carnivore")) and blob.size < self.size * 3) and self.eatCooldown <= 0
+        return ((blob.type == "Herbivore" or (self.dna["isCannibal"] and blob.type == "Carnivore" and blob.size < self.size)) and blob.size < self.size * 3) and self.eatCooldown <= 0
 
     def eat(self, blobs):
         if self.eatCooldown > 0: return
@@ -51,8 +51,9 @@ class Carnivore(Blob):
         self.startSee()
 
         if self.seeTime > 0:
+            target = None
             target = self.findNearbyTarget(blobs)
-            if target:
+            if target != None:
                 self.setTarget(target.pos)
             else:
                 self.updateTarget()

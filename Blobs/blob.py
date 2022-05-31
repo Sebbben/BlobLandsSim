@@ -1,3 +1,4 @@
+from abc import abstractclassmethod
 from math import ceil, dist
 import pygame
 import random
