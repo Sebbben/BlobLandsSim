@@ -162,6 +162,7 @@ class Game:
         self.cam.update()
 
     def collectData(self):
+        return
         numberOfBlobs = len(self.blobs)
         numberOfHerbivores = 0
         numberOfCarnivores = 0
@@ -189,7 +190,7 @@ class Game:
         avrageSizeCarnivore = avrg(avrageSizeCarnivore)
         avrageSizeParasite = avrg(avrageSizeParasite)
 
-        """  
+         
         self.data["numberOfBlobs"].append(numberOfBlobs)
         self.data["numberOfHerbivores"].append(numberOfHerbivores)
         self.data["numberOfCarnivores"].append(numberOfCarnivores)
@@ -199,7 +200,7 @@ class Game:
         self.data["avrageSizeCarnivore"].append(avrageSizeCarnivore)
         self.data["avrageSizeParasite"].append(avrageSizeParasite)
         self.data["foodAmount"].append(foodAmount)
-        """
+        
         #self.data["splitDna"].append(self.splitDnaList)
 
     def populateLists(self):
@@ -210,7 +211,8 @@ class Game:
 
         for _ in range(START_NUMBER_OF_BLOBS): 
             infant = BlobInfant()
-            self.blobs.append(BlobFactory.createBlob(START_BLOB_SIZE, [random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])],self.window,infant))
+            blob = BlobFactory.createBlob(START_BLOB_SIZE, [random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])],self.window,infant)
+            self.blobs.append(blob)
 
         #for _ in range(3): self.blobs.append(Carnivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window, dna={"type":"Carnivore"}))
 
@@ -237,6 +239,7 @@ class Game:
             "maxSize": [],
             "minSize": [],
         }
+        
         for blob in self.blobs:
             if isinstance(blob, Carnivore):
                 avrgMeatEaterDna["maxSize"].append(blob.dna["maxSize"])

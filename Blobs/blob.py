@@ -13,7 +13,7 @@ class Blob:
         
         self.pos = pos
         self.size = size
-        
+
         self.eatEfficiency = 1
         self.dead = False
         self.speed = 4
@@ -28,7 +28,6 @@ class Blob:
         
         self.seeTime = 0
         
-        self.type = "blob"
 
         self.dna = infant.dna
         self.dnaClamp = infant.dnaClamp
@@ -105,10 +104,7 @@ class Blob:
 
     def updateTarget(self):
         if self.target == None or self.distTo(self.target) < self.size - self.speed * self.gamespeed:
-            self.setTarget(self.newRandomTarget()) 
-           
-
-        
+            self.setTarget(self.newRandomTarget())   
 
     def move(self):
         self.pos[0] += self.xMove * self.gamespeed
@@ -126,13 +122,10 @@ class Blob:
         self.checkIfTooSmall()
         self.checkIfTooLarge(blobs, stats)
         
-
     def startSee(self):
         if random.randint(1, 10000) < self.dna["seeChance"]*100 and self.eatCooldown <= 0:
             self.seeTime = self.dna["seeTime"]
-            
-    
-    
+   
     @abstractclassmethod
     def canEat(blob):
         pass
@@ -142,23 +135,22 @@ class Blob:
 
 
     def findNearbyTarget(self, targets):
-        if len(targets) == 0: return
+        if len(targets) <= 1: return # skip if this blob is only one
 
-        self.size -= self.energyConsumption*(self.dna["speed"]/50)
+        self.size -= self.energyConsumption*(self.dna["speed"]/50) # use more energy if you see
         
-
-
         closest = None
-        if not targets[0] is self:        
+
+        if not targets[0] is self: 
             closest = targets[0]
         else:
-            closest = targets[1]    
+            closest = targets[1]
 
         closestdist = self.distTo(closest.pos)
 
         for f in targets:
             dist = self.distTo(f.pos)
-            if 0 < dist < closestdist and self.canEat(f):     
+            if 0 <= dist < closestdist and self.canEat(f):
                 closestdist = dist
                 closest = f
 

@@ -12,7 +12,6 @@ class Herbivore(Blob):
         self.color = HERBIVORE_COLOR
         self.energyConsumption = HERBIVORE_ENERGY_CONSUMPTION
         
-        self.type = "Herbivore"
 
     def move(self):
         super().move() #hvorfor trengs ikke self som en parameter her?
