@@ -1,6 +1,7 @@
 from abc import abstractclassmethod
-from math import ceil, dist
+from math import ceil
 import pygame
+from pygame import Vector2
 import random
 from Blobs.blobInfant import BlobInfant
 
@@ -9,7 +10,7 @@ from functions import clamp
 
 
 class Blob:
-    def __init__(self, size:float, pos:list, window, infant) -> None:
+    def __init__(self, size:float, pos:Vector2, window, infant) -> None:
         
         self.pos = pos
         self.size = size
@@ -42,12 +43,11 @@ class Blob:
         splittNumber = int(self.size // self.dna["minSize"])
         for _ in range(splittNumber):
             newSize = self.size//splittNumber
-            newX = self.pos[0]+random.randint(0,self.size//splittNumber)
-            newY = self.pos[1]+random.randint(0,self.size//splittNumber)
+            newPos = self.pos + [random.randint(0,self.size//splittNumber),random.randint(0,self.size//splittNumber)]
 
             infant = BlobInfant(self.dna, self.dnaClamp)
 
-            blob = BlobFactory().createBlob(newSize, [newX,newY], self.window, infant)
+            blob = BlobFactory().createBlob(newSize, newPos, self.window, infant)
 
             newBlobs.append(blob)
         return newBlobs
@@ -64,25 +64,19 @@ class Blob:
 
         pygame.draw.circle(self.window, color, camera.getScreenPos(self.pos), max(round(self.size*camera.zoomLvl), 1))
         
-    def distTo(self, otherPos):
-        return dist(otherPos,self.pos)
+    def distTo(self, otherPos:Vector2):
+        return (self.pos-otherPos).length()
 
     def readyToSplitt(self) -> bool:
         return self.size > self.dna["maxSize"] * self.splitSizeFactor
 
-
-    def makeMoveVector(self, x, y, steps):
-        xOff = x-self.pos[0]
-        yOff = y-self.pos[1]
-
-        distToTarget = self.distTo([x,y])
-
-        factor = (steps/distToTarget)
-
-        self.xMove = round(xOff*factor,2)
-        self.yMove = round(yOff*factor,2)
+    def makeMoveVector(self,target, steps):
         
-    
+        newVec = target - self.pos
+        newVec.scale_to_length(steps)
+
+        self.moveVector = newVec
+        
 
     def checkIfTooSmall(self):
         if self.size < MIN_BLOB_SIZE:
@@ -96,19 +90,18 @@ class Blob:
                 stats[key].append(self.dna[key])
 
     def newRandomTarget(self):
-        return [random.randint(0,SIMULATION_SIZE[0]-ceil(self.size)), random.randint(0, SIMULATION_SIZE[1]-ceil(self.size))]
+        return Vector2(random.randint(0,SIMULATION_SIZE[0]-ceil(self.size)), random.randint(0, SIMULATION_SIZE[1]-ceil(self.size)))
         
     def setTarget(self, pos):
         self.target = pos
-        self.makeMoveVector(pos[0], pos[1], self.speed*self.gamespeed*(self.dna["speed"]/50))
+        self.makeMoveVector(pos, self.speed*self.gamespeed*(self.dna["speed"]/50))
 
     def updateTarget(self):
-        if self.target == None or self.distTo(self.target) < self.size - self.speed * self.gamespeed:
+        if self.target == None or self.distTo(self.target) < self.size or (self.target-self.pos).normalize() != self.moveVector.normalize():
             self.setTarget(self.newRandomTarget())   
 
     def move(self):
-        self.pos[0] += self.xMove * self.gamespeed
-        self.pos[1] += self.yMove * self.gamespeed
+        self.pos += self.moveVector*self.gamespeed
 
     def update(self, blobs, foods, gamespeed, stats):
         self.gamespeed = gamespeed
@@ -168,19 +161,19 @@ class Blob:
 
         while upper > lower:
             x = mid()
-            if self.pos[0]-rng < xSorted[x].pos[0] < self.pos[0]+rng and xSorted[x] != self:
+            if xSorted[x] != self and self.pos.x-rng < xSorted[x].pos.x < self.pos.x+rng:
                 for i in range(x, upper):
-                    if xSorted[i].pos[0] < self.pos[0]+rng:
+                    if xSorted[i].pos.x < self.pos.x+rng:
                         xFind.append(xSorted[i])
                     else:
                         break
                 for i in range(x-1, lower, -1):
-                    if self.pos[0]-rng < xSorted[i].pos[0]:
+                    if self.pos.x-rng < xSorted[i].pos.x:
                         xFind.append(xSorted[i])
                     else:
                         break
                 break
-            elif xSorted[x].pos[0] > self.pos[0]+rng:
+            elif xSorted[x].pos.x > self.pos.x+rng:
                 upper = x - 1
             else:
                 lower = x + 1

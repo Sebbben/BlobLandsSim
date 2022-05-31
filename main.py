@@ -211,7 +211,7 @@ class Game:
 
         for _ in range(START_NUMBER_OF_BLOBS): 
             infant = BlobInfant()
-            blob = BlobFactory.createBlob(START_BLOB_SIZE, [random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])],self.window,infant)
+            blob = BlobFactory.createBlob(START_BLOB_SIZE, pygame.math.Vector2(random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])),self.window,infant)
             self.blobs.append(blob)
 
         #for _ in range(3): self.blobs.append(Carnivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window, dna={"type":"Carnivore"}))
@@ -239,7 +239,7 @@ class Game:
             "maxSize": [],
             "minSize": [],
         }
-        
+
         for blob in self.blobs:
             if isinstance(blob, Carnivore):
                 avrgMeatEaterDna["maxSize"].append(blob.dna["maxSize"])
