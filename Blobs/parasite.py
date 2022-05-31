@@ -4,19 +4,14 @@ from math import sqrt, pi
 from settings import *
 
 class Parasite(Blob):
-    def __init__(self, size:float, pos:list, window, dna = {}):
-        
-        if not dna:
-            self.dna["maxSize"] = 20
-            super().__init__(size, pos, window, {"maxSize":20})
-        else:
-            super().__init__(size, pos, window, dna)
+    def __init__(self, size:float, pos:list, window, infant):
+
+        super().__init__(size, pos, window, infant)
 
 
 
         self.dnaClamp["maxSize"] = [5,30]
         
-        self.type = "Parasite"
 
 
         self.color = PARASITE_COLOR

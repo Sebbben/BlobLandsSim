@@ -1,38 +1,34 @@
+from pygame import Vector2
 from settings import *
 
 class Camera:
     def __init__(self, window):
-        self.pos = [0,0]
-        self.target = self.pos.copy()
+        self.pos = Vector2()
+        self.target = Vector2()
         self.smoothness = CAMERA_SMOOTHNESS
         self.zoomLvl = 1
         self.zoomTarget = 1
         self.window = window
         self.simsize = SIMULATION_SIZE
         
-    def nonSmoothMove(self, pos:list):
-        self.target[0] += pos[0]
-        self.target[1] += pos[1]
-        self.pos[0] += pos[0]
-        self.pos[1] += pos[1]
+    def nonSmoothMove(self, pos:Vector2):
+        self.target += pos
+        self.pos += pos
 
-    def setTarget(self, target):
+    def setTarget(self, target:Vector2):
         self.target = target 
 
     def moveTarget(self,x,y):
-        self.target[0] += x
-        self.target[1] += y
+        self.target.x += x
+        self.target.y += y
 
     def update(self):
-        moveX = (self.target[0]-self.pos[0])*self.smoothness
-        moveY = (self.target[1]-self.pos[1])*self.smoothness
+        moveVec = (self.target - self.pos)*self.smoothness
         
-        if abs(moveX) + abs(moveY) < CAMERA_MOVE_SNAP_DISTANCE:
-            self.pos[0] = self.target[0]
-            self.pos[1] = self.target[1]
+        if moveVec.length() < CAMERA_MOVE_SNAP_DISTANCE:
+            self.pos = self.target
         else:
-            self.pos[0] += moveX
-            self.pos[1] += moveY
+            self.pos += moveVec
 
 
         if round(abs(self.zoomTarget - self.zoomLvl),5) < CAMERA_ZOOM_SNAP_DISTANCE:
@@ -49,16 +45,13 @@ class Camera:
         self.zoomTarget = 1
 
         onscreenSimMidPos = self.getScreenPos([self.simsize[0]//2, self.simsize[1]//2])
+        winSize = Vector2(self.window.get_width()//2,self.window.get_height()//2)
         
-        diffX = onscreenSimMidPos[0] - self.window.get_width()//2
-        diffY = onscreenSimMidPos[1] - self.window.get_height()//2
+        diff = onscreenSimMidPos-winSize
 
-
-        self.target[0] += diffX
-        self.target[1] += diffY
-        self.pos[0] += diffX
-        self.pos[1] += diffY
-
+        self.target += diff
+        self.pos += diff
+        
         zoomX = self.window.get_width()/self.simsize[0]
         zoomY = self.window.get_height()/self.simsize[1]
 
@@ -66,4 +59,4 @@ class Camera:
 
     
     def getScreenPos(self, worldPos):
-        return [int(worldPos[0] - self.pos[0]) *self.zoomLvl + self.window.get_width()/2, int(worldPos[1] - self.pos[1]) *self.zoomLvl + self.window.get_height()/2]
+        return Vector2(int(worldPos[0] - self.pos[0]) *self.zoomLvl + self.window.get_width()/2, int(worldPos[1] - self.pos[1]) *self.zoomLvl + self.window.get_height()/2)

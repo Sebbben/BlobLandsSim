@@ -3,8 +3,8 @@ from Blobs.blob import Blob
 from settings import *
 
 class Carnivore(Blob):
-    def __init__(self, size:float, pos:list, window, dna = {}):
-        super().__init__(size, pos, window, dna)
+    def __init__(self, size:float, pos:list, window, infant):
+        super().__init__(size, pos, window, infant)
 
         self.energyConsumption = CARNIVORE_ENERGY_CONSUMPTION
         self.color = CARNIVORE_COLOR
@@ -13,9 +13,6 @@ class Carnivore(Blob):
         self.eatEfficiency = 1
         self.isSeeFrame = False
         
-        
-        self.type = "Carnivore"
-
 
     def move(self):
         super().move()
@@ -28,7 +25,7 @@ class Carnivore(Blob):
         """
         
     def canEat(self, blob):
-        return ((blob.type == "Herbivore" or (self.dna["isCannibal"] and blob.type == "Carnivore" and blob.size < self.size)) and blob.size < self.size * 3) and self.eatCooldown <= 0
+        return ((blob.dna["type"] == "Herbivore" or (self.dna["isCannibal"] and blob.dna["type"] == "Carnivore" and blob.size < self.size)) and blob.size < self.size * 3) and self.eatCooldown <= 0
 
     def eat(self, blobs):
         if self.eatCooldown > 0: return
@@ -42,9 +39,7 @@ class Carnivore(Blob):
                 self.size = sqrt(self.size**2 + b.size**2).real
                 b.dead = True
                 #self.seeTime = 0
-                
-                print(b.dna["type"])
-   
+                   
     def update(self, blobs, foods, gamespeed, stats):
         super().update(blobs,foods,gamespeed, stats)
         

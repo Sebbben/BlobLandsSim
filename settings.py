@@ -25,6 +25,7 @@ DATA_COLLECTION_FRAME_INTERVAL = FPS*5
 # ---------- general blob settings ---------
  
 MIN_BLOB_SIZE = 5
+MAX_MUTATION = 1/4
 
 # ---------- per blob settings ----------- 
 
