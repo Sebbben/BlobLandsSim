@@ -97,7 +97,7 @@ class Blob:
         self.makeMoveVector(pos, self.speed*self.gamespeed*(self.dna["speed"]/50))
 
     def updateTarget(self):
-        if self.target == None or self.distTo(self.target) < self.size or (self.target-self.pos).normalize() != self.moveVector.normalize():
+        if self.target == None or self.distTo(self.target) < self.size or ((self.target-self.pos).length() != 0 and self.moveVector.length() != 0 and (self.target-self.pos).normalize() != self.moveVector.normalize()):
             self.setTarget(self.newRandomTarget())   
 
     def move(self):

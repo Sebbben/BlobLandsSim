@@ -134,7 +134,7 @@ class Game:
         
         for blob in self.blobs:
             blob.update(self.blobs,self.foods,self.SPEED,self.splitDnaList)
-
+            
         if self.lastBlobInfo: 
             [posX,posY] = self.cam.getScreenPos(self.lastBlobInfo.pos)
             self.cam.nonSmoothMove([posX-self.window.get_width()//2, posY-self.window.get_height()//2])
@@ -308,9 +308,9 @@ class Game:
         elif event.key == pygame.K_RETURN:
             self.cam.center()
         elif event.key == pygame.K_o:
-            self.blobs.append(Carnivore(START_BLOB_SIZE*2,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window, dna={"type":"Carnivore","seeChance":1}))
+            self.blobs.append(Carnivore(START_BLOB_SIZE*2,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window, BlobInfant(dna={"type":"Carnivore","seeChance":1})))
         elif event.key == pygame.K_i:
-            self.blobs.append(Herbivore(START_BLOB_SIZE*2,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window, dna={"type":"Herbivore"}))
+            self.blobs.append(Herbivore(START_BLOB_SIZE*2,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window, BlobInfant(dna={"type":"Herbivore"})))
             
 
     def updateCam(self):
