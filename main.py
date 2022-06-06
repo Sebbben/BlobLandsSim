@@ -1,6 +1,8 @@
 import pygame, sys, random, math, cProfile, pstats
 
 import pandas as pd
+from Blobs.blobFactory import BlobFactory
+from Blobs.blobInfant import BlobInfant
 
 from Blobs.carnivore import Carnivore
 from Blobs.herbivore import Herbivore
@@ -132,7 +134,7 @@ class Game:
         
         for blob in self.blobs:
             blob.update(self.blobs,self.foods,self.SPEED,self.splitDnaList)
-
+            
         if self.lastBlobInfo: 
             [posX,posY] = self.cam.getScreenPos(self.lastBlobInfo.pos)
             self.cam.nonSmoothMove([posX-self.window.get_width()//2, posY-self.window.get_height()//2])
@@ -160,6 +162,7 @@ class Game:
         self.cam.update()
 
     def collectData(self):
+        return
         numberOfBlobs = len(self.blobs)
         numberOfHerbivores = 0
         numberOfCarnivores = 0
@@ -187,7 +190,7 @@ class Game:
         avrageSizeCarnivore = avrg(avrageSizeCarnivore)
         avrageSizeParasite = avrg(avrageSizeParasite)
 
-        """  
+         
         self.data["numberOfBlobs"].append(numberOfBlobs)
         self.data["numberOfHerbivores"].append(numberOfHerbivores)
         self.data["numberOfCarnivores"].append(numberOfCarnivores)
@@ -197,7 +200,7 @@ class Game:
         self.data["avrageSizeCarnivore"].append(avrageSizeCarnivore)
         self.data["avrageSizeParasite"].append(avrageSizeParasite)
         self.data["foodAmount"].append(foodAmount)
-        """
+        
         #self.data["splitDna"].append(self.splitDnaList)
 
     def populateLists(self):
@@ -206,7 +209,10 @@ class Game:
 
         self.foods.sort(key=lambda f:f.pos[0])
 
-        for _ in range(START_NUMBER_OF_BLOBS): self.blobs.append(Herbivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window))
+        for _ in range(START_NUMBER_OF_BLOBS): 
+            infant = BlobInfant()
+            blob = BlobFactory.createBlob(START_BLOB_SIZE, pygame.math.Vector2(random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])),self.window,infant)
+            self.blobs.append(blob)
 
         #for _ in range(3): self.blobs.append(Carnivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window, dna={"type":"Carnivore"}))
 
@@ -233,6 +239,7 @@ class Game:
             "maxSize": [],
             "minSize": [],
         }
+
         for blob in self.blobs:
             if isinstance(blob, Carnivore):
                 avrgMeatEaterDna["maxSize"].append(blob.dna["maxSize"])
@@ -301,9 +308,9 @@ class Game:
         elif event.key == pygame.K_RETURN:
             self.cam.center()
         elif event.key == pygame.K_o:
-            self.blobs.append(Carnivore(START_BLOB_SIZE*2,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window, dna={"type":"Carnivore","seeChance":1}))
+            self.blobs.append(Carnivore(START_BLOB_SIZE*2,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window, BlobInfant(dna={"type":"Carnivore","seeChance":1})))
         elif event.key == pygame.K_i:
-            self.blobs.append(Herbivore(START_BLOB_SIZE*2,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window, dna={"type":"Herbivore"}))
+            self.blobs.append(Herbivore(START_BLOB_SIZE*2,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window, BlobInfant(dna={"type":"Herbivore"})))
             
 
     def updateCam(self):

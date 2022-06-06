@@ -5,9 +5,7 @@ from settings import *
 
 class Food:
     def __init__(self, window, age = 0) -> None:
-        
-        self.type = "food"
-        
+                
         self.size = ri(5,10)
         self.color = FOOD_COLOR()
         self.maxAge = (30)*20  #  (FPS) * seconds
@@ -15,7 +13,7 @@ class Food:
 
         self.SIMULATION_SIZE = SIMULATION_SIZE
         
-        self.pos = [ri(0,self.SIMULATION_SIZE[0]), ri(0, self.SIMULATION_SIZE[1])]
+        self.pos = pygame.math.Vector2(ri(0,self.SIMULATION_SIZE[0]), ri(0, self.SIMULATION_SIZE[1]))
         self.window = window
 
 
