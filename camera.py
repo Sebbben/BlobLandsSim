@@ -24,15 +24,14 @@ class Camera:
 
     def update(self):
         moveVec = (self.target - self.pos)*self.smoothness
-        
-        if moveVec.length() < CAMERA_MOVE_SNAP_DISTANCE:
-            self.pos = self.target
+
+        if moveVec.magnitude() < CAMERA_MOVE_SNAP_DISTANCE:
+            self.pos = Vector2(self.target)
         else:
             self.pos += moveVec
 
-
         if round(abs(self.zoomTarget - self.zoomLvl),5) < CAMERA_ZOOM_SNAP_DISTANCE:
-            self.zoomLvl = self.zoomTarget
+            self.zoomLvl = self.zoomTarge
         else:
             self.zoomLvl += (self.zoomTarget - self.zoomLvl)*self.smoothness
 
