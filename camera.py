@@ -31,7 +31,7 @@ class Camera:
             self.pos += moveVec
 
         if round(abs(self.zoomTarget - self.zoomLvl),5) < CAMERA_ZOOM_SNAP_DISTANCE:
-            self.zoomLvl = self.zoomTarge
+            self.zoomLvl = self.zoomTarget
         else:
             self.zoomLvl += (self.zoomTarget - self.zoomLvl)*self.smoothness
 

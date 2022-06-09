@@ -7,9 +7,11 @@ from Blobs.blobInfant import BlobInfant
 from Blobs.carnivore import Carnivore
 from Blobs.herbivore import Herbivore
 from Blobs.parasite import Parasite
+from blobsList import BlobList
 
 from food import Food
 from camera import Camera
+from foodList import FoodList
 
 from settings import *
 from functions import *
@@ -76,8 +78,8 @@ class Game:
 
         self.fpsClock = pygame.time.Clock()
 
-        self.blobs = []
-        self.foods = []
+        self.blobs = BlobList()
+        self.foods = FoodList()
 
         self.populateLists()
 
@@ -141,7 +143,7 @@ class Game:
         
         self.blobs = [blob for blob in self.blobs if not blob.dead]
 
-        self.checkIfRottenFood()
+        self.foods.removeRotten()
 
 
         
@@ -215,10 +217,6 @@ class Game:
             self.blobs.append(blob)
 
         #for _ in range(3): self.blobs.append(Carnivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window, dna={"type":"Carnivore"}))
-
-               
-    def checkIfRottenFood(self):
-        self.foods = [food for food in self.foods if food.notRotten()]
 
     def getBlobInfo(self):
         
