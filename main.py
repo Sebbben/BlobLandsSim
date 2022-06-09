@@ -1,4 +1,4 @@
-import pygame, sys, random, math, cProfile, pstats
+import pygame, sys, random, math, cProfile, pstats, time
 
 import pandas as pd
 from Blobs.blobFactory import BlobFactory
@@ -23,6 +23,7 @@ class Game:
         self.SEE_TARGET_LINES = False
         self.lastBlobInfo = None
         self.paused = False
+        self.t = time.time()
 
         self.dataIntervalTimer = 0
         self.data = {
@@ -333,6 +334,7 @@ class Game:
 
     def quitGame(self):
         
+        print("Time: " + str(time.time()-self.t))
         #pd.DataFrame(self.data).to_csv("blobData.csv")
         pd.DataFrame(self.splitDnaList).to_csv("blobData.csv")
 
