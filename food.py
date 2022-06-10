@@ -1,5 +1,6 @@
 import pygame
 from random import randint as ri
+from pygame import Vector2
 
 from settings import *
 
@@ -13,7 +14,7 @@ class Food:
 
         self.SIMULATION_SIZE = SIMULATION_SIZE
         
-        self.pos = pygame.math.Vector2(ri(0,self.SIMULATION_SIZE[0]), ri(0, self.SIMULATION_SIZE[1]))
+        self.pos = Vector2(ri(0,self.SIMULATION_SIZE[0]), ri(0, self.SIMULATION_SIZE[1]))
         self.window = window
 
 

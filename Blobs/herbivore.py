@@ -1,5 +1,3 @@
-import random
-
 from pygame import Vector2
 from Blobs.blob import Blob
 from math import sqrt
@@ -10,7 +8,6 @@ class Herbivore(Blob):
     def __init__(self, size:float, pos:Vector2, window, infant):
         super().__init__(size, pos, window, infant)
 
-        self.isSeeFrame = False
         self.color = HERBIVORE_COLOR
         self.energyConsumption = HERBIVORE_ENERGY_CONSUMPTION
         
@@ -25,7 +22,7 @@ class Herbivore(Blob):
     def eat(self, foods):
         close = foods.getRange([self.pos.x-self.size*2,self.pos.y+self.size*2])
 
-        newFoods = foods.copy()        
+        newFoods = foods.copy()
 
         for food in close:
             if self.distTo(food.pos) < self.size+(food.size/2):

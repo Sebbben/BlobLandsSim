@@ -1,18 +1,25 @@
 class FoodList(list):
     def __init__(self):
         super().__init__()
+
+    def append(self, f):
+        for i in range(len(self)):
+            if self[i].pos[0] > f.pos[0]:
+                self.insert(i, f)
+                break
+        else:  
+            super().append(f)
     
     def getRange(self, rng):
 
         upper = len(self)
         lower = 0
 
-        mid = lambda: (upper + lower) // 2
-        xFind = []        
+        xFind = []
 
         while upper > lower:
-            x = mid()
-            if rng[0] < self[x].pos.x < rng[1] :#self[x] != self and self.pos.x-rng < self[x].pos.x < self.pos.x+rng:
+            x = (upper + lower) // 2
+            if rng[0] < self[x].pos.x < rng[1] :
                 for i in range(x, upper):
                     if self[i].pos.x < rng[1]:
                         xFind.append(self[i])
