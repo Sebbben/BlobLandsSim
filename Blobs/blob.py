@@ -4,13 +4,14 @@ import pygame
 import random
 from Blobs.blobInfant import BlobInfant
 from pygame import Vector2
+import numpy as np
 
 from settings import *
 from functions import clamp
 
 
 class Blob:
-    def __init__(self, size:float, pos:Vector2, window, infant) -> None:
+    def __init__(self, size:float, pos:np.typing.NDArray, window, infant) -> None:
         
         self.pos = pos
         self.size = size
@@ -53,10 +54,10 @@ class Blob:
         splittNumber = int(self.size // self.dna["minSize"])
         for _ in range(splittNumber):
             newSize = int(self.size//splittNumber)
-            newX = self.pos.x+random.randint(0,newSize)
-            newY = self.pos.y+random.randint(0,newSize)
+            newX = self.pos[0]+random.randint(0,newSize)
+            newY = self.pos[1]+random.randint(0,newSize)
 
-            blob = BlobFactory().createBlob(newSize, Vector2(newX,newY), self.window, BlobInfant(self.dna, self.dnaClamp))
+            blob = BlobFactory().createBlob(newSize, np.array((newX,newY)), self.window, BlobInfant(self.dna, self.dnaClamp))
 
             newBlobs.append(blob)
         return newBlobs
@@ -111,21 +112,19 @@ class Blob:
     def distTo(self, otherPos):
         return dist(otherPos,self.pos)
 
+
     def readyToSplitt(self) -> bool:
         return self.size > self.dna["maxSize"] * self.splitSizeFactor
 
 
-    def makeMoveVector(self, x, y, steps):
-        xOff = x-self.pos[0]
-        yOff = y-self.pos[1]
-
-        distToTarget = self.distTo([x,y])
+    def makeMoveVector(self, vec: np.typing.NDArray, steps):
+        
+        offset = vec - self.pos
+        distToTarget = np.linalg.vector_norm(offset)
 
         factor = (steps/distToTarget)
 
-        self.xMove = round(xOff*factor,2)
-        self.yMove = round(yOff*factor,2)
-        
+        self.moveVec = offset * factor
     
 
     def checkIfTooSmall(self):
@@ -144,18 +143,18 @@ class Blob:
         
     def setTarget(self, pos):
         self.target = pos
-        self.makeMoveVector(pos[0], pos[1], self.speed*self.gamespeed*(self.dna["speed"]/50))
+        self.makeMoveVector(pos, self.speed*self.gamespeed*(self.dna["speed"]/50))
 
     def updateTarget(self):
-        if self.target == None or self.distTo(self.target) < self.size - self.speed * self.gamespeed:
+        
+        if self.target is None or np.linalg.norm((self.pos - self.target)) < self.size - self.speed * self.gamespeed:
             self.setTarget(self.newRandomTarget()) 
            
 
         
 
     def move(self):
-        self.pos[0] += self.xMove * self.gamespeed
-        self.pos[1] += self.yMove * self.gamespeed
+        self.pos += self.moveVec * self.gamespeed
 
     def update(self, blobs, foods, gamespeed, stats):
         self.gamespeed = gamespeed

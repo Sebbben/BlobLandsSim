@@ -1,11 +1,11 @@
-from pygame import Vector2
 from Blobs.blob import Blob
 from math import sqrt
+import numpy as np
 
 from settings import *
 
 class Herbivore(Blob):
-    def __init__(self, size:float, pos:Vector2, window, infant):
+    def __init__(self, size:float, pos:np.typing.NDArray, window, infant):
         super().__init__(size, pos, window, infant)
 
         self.color = HERBIVORE_COLOR
@@ -22,7 +22,7 @@ class Herbivore(Blob):
 
     def eat(self, foods):
 
-        close = foods.getRange([self.pos.x-self.size*2,self.pos.x+self.size*2])
+        close = foods.getRange([self.pos[0]-self.size*2,self.pos[0]+self.size*2])
 
 
         toRemove = []
@@ -41,7 +41,7 @@ class Herbivore(Blob):
         self.startSee()
 
         if self.seeTime > 0:
-            target = self.findNearbyTarget(foods.getRange([self.pos.x-self.dna["seeRange"],self.pos.y+self.dna["seeRange"]]))
+            target = self.findNearbyTarget(foods.getRange([self.pos[0]-self.dna["seeRange"],self.pos[1]+self.dna["seeRange"]]))
             if target:
                 self.setTarget(target.pos)
             else:

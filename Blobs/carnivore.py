@@ -25,13 +25,22 @@ class Carnivore(Blob):
         """
         
     def canEat(self, blob):
-        return ((blob.dna["type"] == "Herbivore" or (self.dna["isCannibal"] and blob.dna["type"] == "Carnivore" and blob.size < self.size)) and blob.size < self.size * 3) and self.eatCooldown <= 0
+        return (
+            (
+                blob.dna["type"] == "Herbivore" or 
+                (
+                    self.dna["isCannibal"] and 
+                    blob.dna["type"] == "Carnivore" and 
+                    blob.size < self.size
+                )
+            ) and 
+            blob.size < self.size * 3
+        ) and self.eatCooldown <= 0
 
     def eat(self, blobs):
-        if self.eatCooldown > 0: return
         for b in blobs: 
             if not self.canEat(b): continue 
-            if self.distTo(b.pos) < self.size + (b.size*(3/4)):
+            if not b.dead and self.distTo(b.pos) < self.size + (b.size*(3/4)):
                 #self.eatCooldown = b.size*(FPS*0.5)
                 self.eatCooldown = 0
                 self.size = sqrt(self.size**2 + b.size**2).real
@@ -39,6 +48,7 @@ class Carnivore(Blob):
                    
     def update(self, blobs, foods, gamespeed, stats):
         super().update(blobs,foods,gamespeed, stats)
+        if self.dead: return
         
         self.startSee()
 

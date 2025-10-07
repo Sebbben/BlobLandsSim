@@ -1,6 +1,8 @@
 import pygame, sys, random, math, cProfile, pstats, time
 
 import pandas as pd
+import numpy as np
+
 from Blobs.blobFactory import BlobFactory
 from Blobs.blobInfant import BlobInfant
 
@@ -43,12 +45,6 @@ class Game:
         self.data = {
             "splitDna":[]
         }
-
-        self.camMovingRight = False
-        self.camMovingLeft = False
-        self.camMovingUp = False
-        self.camMovingDown = False
-        
         
         self.defaultDna = {
             "maxSize": 80,
@@ -115,40 +111,40 @@ class Game:
             pygame.display.flip()
 
             self.fpsClock.tick(FPS)
+            # print(self.fpsClock.get_fps())
 
     def update(self):
-
         if self.dataIntervalTimer > DATA_COLLECTION_FRAME_INTERVAL:
             self.dataIntervalTimer = 0
             self.collectData()
 
         self.dataIntervalTimer += 1
         
-        for _ in range(NEW_FOOD_PER_FRAME):
-            if random.randint(1, 2) == 1:
-                f = Food(self.window)
-                self.foods.append(f)     
+        for _ in range(NEW_FOOD_PER_FRAME//2):
+            f = Food(self.window)
+            self.foods.append(f)
 
-        for food in self.foods:
-            food.update()
+        # for food in self.foods:
+        #     food.update()
         
         for blob in self.blobs:
             blob.update(self.blobs,self.foods,self.SPEED,self.splitDnaList)
             
         if self.lastBlobInfo: 
             [posX,posY] = self.cam.getScreenPos(self.lastBlobInfo.pos)
-            self.cam.nonSmoothMove([posX-self.window.get_width()//2, posY-self.window.get_height()//2])
+            self.cam.nonSmoothMove(np.array([posX-self.window.get_width()//2, posY-self.window.get_height()//2]))
         
         self.blobs = [blob for blob in self.blobs if not blob.dead]
 
-        self.foods.removeRotten()
+        # self.foods.removeRotten()
 
 
         
     def draw(self):
-
+        drawCalls = 0
         for food in self.foods:
-            food.draw(self.cam)
+            drawCalls += food.draw(self.cam)
+        print("Num food draw calls", drawCalls)
         
         for blob in self.blobs:
             blob.draw(self.cam, self.SEE_TARGET_LINES)
@@ -211,7 +207,17 @@ class Game:
 
         for _ in range(START_NUMBER_OF_BLOBS): 
             infant = BlobInfant()
-            blob = BlobFactory.createBlob(START_BLOB_SIZE, pygame.math.Vector2(random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])),self.window,infant)
+            blob = BlobFactory.createBlob(
+                START_BLOB_SIZE, 
+                np.array(
+                    (
+                        random.random() * SIMULATION_SIZE[0], 
+                        random.random() * SIMULATION_SIZE[1]
+                    )
+                ),
+                self.window,
+                infant
+            )
             self.blobs.append(blob)
 
         #for _ in range(3): self.blobs.append(Carnivore(START_BLOB_SIZE,[random.randint(0,SIMULATION_SIZE[0]), random.randint(0, SIMULATION_SIZE[1])], self.window, dna={"type":"Carnivore"}))
@@ -225,6 +231,10 @@ class Game:
             if math.dist(self.cam.getScreenPos(blob.pos), mousePos) < blob.size * self.cam.zoomLvl:
                 self.lastBlobInfo = blob
                 self.cam.zoomTarget = 1
+        
+
+
+
     def showStats(self):
         
         avrgVegiDna = {

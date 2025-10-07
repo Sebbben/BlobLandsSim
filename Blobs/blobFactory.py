@@ -1,9 +1,8 @@
-from pygame import Vector2
-
+import numpy as np
 
 class BlobFactory:
     @staticmethod
-    def createBlob(size:float, pos:Vector2, window, infant):
+    def createBlob(size:float, pos:np.typing.NDArray, window, infant):
         if infant.dna["type"] == "Herbivore":
             return herbivore.Herbivore(size, pos, window, infant)
         if infant.dna["type"] == "Carnivore":
