@@ -1,4 +1,4 @@
-from abc import abstractclassmethod
+from abc import abstractmethod
 from math import ceil, dist
 import pygame
 import random
@@ -52,9 +52,9 @@ class Blob:
         newBlobs = []
         splittNumber = int(self.size // self.dna["minSize"])
         for _ in range(splittNumber):
-            newSize = self.size//splittNumber
-            newX = self.pos.x+random.randint(0,self.size//splittNumber)
-            newY = self.pos.y+random.randint(0,self.size//splittNumber)
+            newSize = int(self.size//splittNumber)
+            newX = self.pos.x+random.randint(0,newSize)
+            newY = self.pos.y+random.randint(0,newSize)
 
             blob = BlobFactory().createBlob(newSize, Vector2(newX,newY), self.window, BlobInfant(self.dna, self.dnaClamp))
 
@@ -176,7 +176,7 @@ class Blob:
             
     
     
-    @abstractclassmethod
+    @abstractmethod
     def canEat(blob):
         pass
     

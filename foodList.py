@@ -11,7 +11,7 @@ class FoodList(list):
             super().append(f)
     
     def getRange(self, rng):
-
+        """Returns a list of food objects that are in the given range on the x-axis"""
         upper = len(self)
         lower = 0
 
@@ -19,7 +19,7 @@ class FoodList(list):
 
         while upper > lower:
             x = (upper + lower) // 2
-            if rng[0] < self[x].pos.x < rng[1] :
+            if rng[0] < self[x].pos.x < rng[1]:
                 for i in range(x, upper):
                     if self[i].pos.x < rng[1]:
                         xFind.append(self[i])

@@ -4,9 +4,9 @@ FPS = 120 # frames per second setting
 WIN_W = 1920
 WIN_H = 1080
 
-SIMULATION_SIZE = [4000, 4000]
+SIMULATION_SIZE = [6000, 6000]
 
-FOOD_DENCITY = 1/7000
+FOOD_DENCITY = 1/10000
 FOOD_AMOUNT = int((SIMULATION_SIZE[0]*SIMULATION_SIZE[1])*FOOD_DENCITY)
 FOOD_COLOR = lambda: (0,ri(180,255),0)
 NEW_FOOD_PER_FRAME = int(FOOD_AMOUNT/(FPS*5))
@@ -25,7 +25,7 @@ DATA_COLLECTION_FRAME_INTERVAL = FPS*5
 # ---------- general blob settings ---------
  
 MIN_BLOB_SIZE = 5
-MAX_MUTATION = 1/4
+MAX_MUTATION = 1/8
 
 # ---------- per blob settings ----------- 
 

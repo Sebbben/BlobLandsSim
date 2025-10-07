@@ -15,23 +15,26 @@ class Herbivore(Blob):
     def move(self):
         super().move() #hvorfor trengs ikke self som en parameter her?
         
+
     def canEat(self, blob):
         return True
         
 
     def eat(self, foods):
-        close = foods.getRange([self.pos.x-self.size*2,self.pos.y+self.size*2])
 
-        newFoods = foods.copy()
+        close = foods.getRange([self.pos.x-self.size*2,self.pos.x+self.size*2])
+
+
+        toRemove = []
 
         for food in close:
             if self.distTo(food.pos) < self.size+(food.size/2):
                 self.size = sqrt(self.size**2 + food.size**2).real
-                newFoods.remove(food)
+                toRemove.append(food)
 
-        foods.clear()
-        foods.extend(newFoods)
-            
+        for food in toRemove:
+            foods.remove(food)
+
     def update(self, blobs, foods, gamespeed, stats):
         super().update(blobs,foods,gamespeed, stats)
 
